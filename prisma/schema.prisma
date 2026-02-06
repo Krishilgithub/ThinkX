@@ -76,16 +76,48 @@ model Video {
   title       String   // Renamed from 'topic' to title for consistency, can serve as topic
   script      String?  @db.Text
   videoUrl    String?
+  muxPlaybackId String?
   duration    Float?   // Duration in seconds
-  status      String   @default("DRAFT") // DRAFT, PROCESSING, READY
+  
+  // HeyGen Generation Metadata
+  heygenId    String?  // ID returned by HeyGen
+  status      String   @default("DRAFT") // DRAFT, PROCESSING, COMPLETED, FAILED
+  tone        String?
+  language    String?
+  avatarId    String?
+  voiceId     String?
+  
+  orderIndex  Int     @default(0)
   
   chapterId   String
   chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   
   analytics   VideoAnalytics?
+  jobs        VideoJob[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  @@index([chapterId])
+}
+
+model VideoJob {
+  id            String   @id @default(uuid())
+  videoId       String
+  video         Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  heygenJobId   String?
+  status        String   // PENDING, PROCESSING, COMPLETED, FAILED
+  progress      Int      @default(0)
+  error         String?
+  
+  startedAt     DateTime @default(now())
+  completedAt   DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([videoId])
 }
 
 model Enrollment {

@@ -20,7 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: BookOpen, label: "My Lessons", href: "/dashboard/lessons" },
+  { icon: BookOpen, label: "My Courses", href: "/dashboard/courses" },
   { icon: PlusCircle, label: "Create Lesson", href: "/dashboard/create" },
   { icon: Library, label: "Library", href: "/dashboard/library" },
   { icon: BarChart, label: "Analytics", href: "/dashboard/analytics" },
