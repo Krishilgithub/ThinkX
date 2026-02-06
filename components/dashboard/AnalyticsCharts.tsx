@@ -43,7 +43,7 @@ export function AnalyticsCharts({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
+          <div className="h-[300px] w-full min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={retentionData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -71,7 +71,7 @@ export function AnalyticsCharts({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
+          <div className="h-[300px] w-full min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -104,7 +104,7 @@ export function AnalyticsCharts({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
+          <div className="h-[300px] w-full min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={engagementWeek}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
