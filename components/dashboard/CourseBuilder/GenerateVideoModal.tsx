@@ -35,7 +35,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createVideoJob } from "@/actions/video-generation";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+
+// ... (imports)
 
 const formSchema = z.object({
   title: z
@@ -49,7 +51,8 @@ const formSchema = z.object({
   tone: z.string().default("professional"),
   language: z.string().default("en"),
   avatarId: z.string().default("default-avatar"),
-  background: z.string().default("#ffffff"),
+  background: z.string().default("default-background"),
+  visibility: z.string().default("private"),
 });
 
 interface GenerateVideoModalProps {
@@ -58,15 +61,17 @@ interface GenerateVideoModalProps {
   trigger?: React.ReactNode;
 }
 
+// ...
+
 export function GenerateVideoModal({
   chapterId,
   onSuccess,
   trigger,
 }: GenerateVideoModalProps) {
   const [open, setOpen] = useState(false);
-  const { toast } = useToast();
+  // removed useToast hook
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -74,7 +79,8 @@ export function GenerateVideoModal({
       tone: "professional",
       language: "en",
       avatarId: "default-avatar",
-      background: "#ffffff",
+      background: "default-background",
+      visibility: "private",
     },
   });
 
@@ -85,16 +91,13 @@ export function GenerateVideoModal({
       const result = await createVideoJob(chapterId, values);
 
       if (result.error) {
-        toast({
-          variant: "destructive",
-          title: "Generation Failed",
+        toast.error("Generation Failed", {
           description: result.error,
         });
         return;
       }
 
-      toast({
-        title: "Generation Started",
+      toast.success("Generation Started", {
         description:
           "Your video is being created. This may take a few minutes.",
       });
@@ -103,9 +106,7 @@ export function GenerateVideoModal({
       form.reset();
       onSuccess?.();
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
+      toast.error("Error", {
         description: "Something went wrong. Please try again.",
       });
     }
@@ -215,6 +216,35 @@ export function GenerateVideoModal({
                         <SelectItem value="en">English</SelectItem>
                         <SelectItem value="es">Spanish</SelectItem>
                         <SelectItem value="fr">French</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="visibility"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Visibility</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select visibility" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="private">
+                          Private (Only You)
+                        </SelectItem>
+                        <SelectItem value="public">
+                          Public (Students)
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

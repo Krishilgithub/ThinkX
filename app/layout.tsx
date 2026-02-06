@@ -19,6 +19,8 @@ export const metadata: Metadata = {
     "Transform text into professional teaching videos with AI avatars and voice synthesis. The ultimate platform for educators.",
 };
 
+import { Toaster } from "@/components/ui/sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,6 +32,7 @@ export default function RootLayout({
         className={`${inter.variable} ${spaceGrotesk.variable} antialiased bg-background text-foreground`}
       >
         <SmoothScroll>{children}</SmoothScroll>
+        <Toaster />
       </body>
     </html>
   );

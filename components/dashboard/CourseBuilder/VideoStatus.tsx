@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, CheckCircle, AlertCircle, Play } from "lucide-react";
+import {
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  Play,
+  Clapperboard,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { pollVideoStatus } from "@/actions/video-generation";
@@ -114,5 +120,3 @@ export function VideoStatus({
     </div>
   );
 }
-
-import { Clapperboard } from "lucide-react";
