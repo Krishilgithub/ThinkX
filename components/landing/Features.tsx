@@ -63,14 +63,37 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="py-24 bg-zinc-900/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section
+      id="features"
+      className="py-24 bg-zinc-50 relative overflow-hidden"
+    >
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6">
+          <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-zinc-900">
             Everything you need to{" "}
-            <span className="text-primary">scale yourself</span>
+            <span className="text-primary relative inline-block">
+              scale yourself
+              <svg
+                className="absolute -bottom-2 left-0 w-full h-2 text-primary/20"
+                viewBox="0 0 100 10"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M0 5 Q 50 10 100 5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
+            </span>
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-zinc-600">
             Our platform handles the heavy lifting of video production, so you
             can focus on what matters most: teaching and curriculum quality.
           </p>
@@ -82,22 +105,25 @@ export function Features() {
               key={feature.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full bg-white/5 border-white/10 hover:border-primary/50 transition-colors duration-300">
+              <Card className="h-full bg-white border-zinc-200/60 shadow-lg shadow-zinc-200/50 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 group">
                 <CardHeader>
                   <div
-                    className={`w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-4 ${feature.color}`}
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 ${feature.color.replace(
+                      "text-",
+                      "bg-",
+                    )}/10`}
                   >
-                    <feature.icon className="w-6 h-6" />
+                    <feature.icon className={`w-6 h-6 ${feature.color}`} />
                   </div>
-                  <CardTitle className="text-xl font-heading text-foreground">
+                  <CardTitle className="text-xl font-heading text-zinc-900 group-hover:text-primary transition-colors">
                     {feature.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-base text-muted-foreground/80">
+                  <CardDescription className="text-base text-zinc-500">
                     {feature.description}
                   </CardDescription>
                 </CardContent>

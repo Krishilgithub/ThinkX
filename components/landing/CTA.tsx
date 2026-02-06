@@ -26,7 +26,7 @@ export function CTA() {
           <Button
             variant="outline"
             size="lg"
-            className="h-14 px-10 text-lg border-zinc-200 text-zinc-900 hover:bg-zinc-50 hover:text-primary"
+            className="h-14 px-10 text-lg border-zinc-200 text-zinc-100 hover:bg-zinc-50 hover:text-primary"
           >
             Compare Plans
           </Button>

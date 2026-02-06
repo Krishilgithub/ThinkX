@@ -1,7 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/landing/Hero";
-import { Logos } from "@/components/landing/Logos";
 import { Features } from "@/components/landing/Features";
 import { Workflow } from "@/components/landing/Workflow";
 import { Testimonials } from "@/components/landing/Testimonials";
@@ -15,7 +14,6 @@ export default function Home() {
       <Navbar />
       <main className="flex-grow">
         <Hero />
-        <Logos />
         <Features />
         <Workflow />
         <Testimonials />

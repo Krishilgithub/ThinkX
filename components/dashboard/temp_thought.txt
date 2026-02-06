@@ -1,0 +1,3 @@
+"use server";
+// Actually this file is already page.tsx. I need to creating a separate Client Component file.
+// I will create `components/dashboard/MyLessonsClient.tsx`
