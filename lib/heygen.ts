@@ -6,6 +6,7 @@ export interface CreateVideoParams {
   avatarId?: string;
   voiceId?: string;
   background?: string;
+  visibility?: string;
 }
 
 export interface HeyGenJobStatus {
@@ -36,39 +37,60 @@ export class HeyGenService {
     }
 
     try {
+      const payload = {
+        video_inputs: [
+          {
+            character: {
+              type: "avatar",
+              avatar_id: params.avatarId || "default-avatar-id",
+              avatar_style: "normal",
+            },
+            voice: {
+              type: "text",
+              text: {
+                voice_id: params.voiceId || "2d5b0e6cf361460aa7fc47e3eee4bab2",
+                input_text: params.description || params.title,
+              },
+            },
+            background: {
+              type: "color",
+              value: params.background || "#ffffff",
+            },
+          },
+        ],
+        test: true,
+        caption: false,
+        title: params.title,
+      };
+
+      console.log(
+        "[HeyGen] Sending payload:",
+        JSON.stringify(payload, null, 2),
+      );
+
       const response = await fetch("https://api.heygen.com/v2/video/generate", {
         method: "POST",
         headers: {
           "X-Api-Key": this.apiKey,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          video_inputs: [
-            {
-              character: {
-                type: "avatar",
-                avatar_id: params.avatarId || "default-avatar-id",
-                avatar_style: "normal",
-              },
-              voice: {
-                type: "audio",
-                voice_id: params.voiceId || "default-voice-id",
-              },
-              background: {
-                type: "color",
-                value: params.background || "#ffffff",
-              },
-              text: params.description || params.title, // Simple text to speech for now
-            },
-          ],
-          test: true, // Use test mode for non-production
-          caption: false,
-          title: params.title,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error(`HeyGen API Error: ${response.statusText}`);
+        let errorBody;
+        try {
+          errorBody = await response.json();
+        } catch (e) {
+          errorBody = await response.text();
+        }
+        console.error(
+          "HeyGen API Error Body:",
+          JSON.stringify(errorBody, null, 2),
+        );
+        throw new Error(
+          `HeyGen API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorBody)}`,
+        );
       }
 
       const data = await response.json();

@@ -76,6 +76,7 @@ model Video {
   title       String   // Renamed from 'topic' to title for consistency, can serve as topic
   script      String?  @db.Text
   videoUrl    String?
+  thumbnail   String?
   muxPlaybackId String?
   duration    Float?   // Duration in seconds
   
@@ -86,6 +87,7 @@ model Video {
   language    String?
   avatarId    String?
   voiceId     String?
+  visibility  String   @default("private") // private, public
   
   orderIndex  Int     @default(0)
   

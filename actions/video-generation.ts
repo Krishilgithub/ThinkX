@@ -20,6 +20,7 @@ export async function createVideoJob(
         language: params.language,
         avatarId: params.avatarId,
         voiceId: params.voiceId,
+        visibility: params.visibility || "private",
       },
     });
 
