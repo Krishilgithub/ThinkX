@@ -26,17 +26,17 @@ import {
 interface Course {
   id: string;
   title: string;
+  subject: string;
+  topic: string;
   description: string | null;
   thumbnail: string | null;
   status: string;
-  enrollments?: any[]; // types...
-  analytics: {
-    totalViews: number;
-    completionRate: number;
-  } | null;
+  duration: number;
+  targetAudience: string;
+  ageGroup: string;
+  style: string;
   _count?: {
     chapters: number;
-    enrollments: number;
   };
   updatedAt: Date;
 }
@@ -79,15 +79,23 @@ export function CourseGrid({ courses }: CourseGridProps) {
           </CardHeader>
 
           <CardContent className="p-4 pt-2 flex-grow">
-            <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+            <div className="flex items-center justify-between text-xs text-muted-foreground w-full mb-2">
               <div className="flex items-center gap-1">
                 <BookOpen className="h-3.5 w-3.5" />
                 <span>{course._count?.chapters || 0} Chapters</span>
               </div>
               <div className="flex items-center gap-1">
-                <Users className="h-3.5 w-3.5" />
-                <span>{course._count?.enrollments || 0} Students</span>
+                <Clock className="h-3.5 w-3.5" />
+                <span>{Math.floor(course.duration / 60)} min</span>
               </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <Badge variant="outline" className="text-xs">
+                {course.targetAudience}
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                {course.ageGroup}
+              </Badge>
             </div>
           </CardContent>
 

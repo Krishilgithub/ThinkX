@@ -2,24 +2,24 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, GripVertical, MoreVertical, Pencil, Trash2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, GripVertical, Pencil, Trash2, PlayCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createChapter } from "@/actions/chapter";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-
-import { VideoItem } from "./VideoItem";
 import { GenerateVideoModal } from "./GenerateVideoModal";
+import { VideoStatus } from "./VideoStatus";
 import { useRouter } from "next/navigation";
 
 interface Chapter {
   id: string;
   title: string;
-  videos: any[];
-  orderIndex: number;
+  description: string | null;
+  videoUrl: string | null;
   status: string;
+  duration: number | null;
+  orderIndex: number;
 }
 
 interface ChapterListProps {
@@ -38,11 +38,15 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
     if (!newChapterTitle.trim()) return;
     setLoading(true);
     try {
-      const newChapter = await createChapter(courseId, newChapterTitle);
-      setChapters([...chapters, { ...newChapter, videos: [] }]);
+      const newChapter = await createChapter({ 
+        courseId, 
+        title: newChapterTitle 
+      });
+      setChapters([...chapters, newChapter]);
       setNewChapterTitle("");
       setIsCreating(false);
       toast.success("Chapter created");
+      router.refresh();
     } catch (error) {
       toast.error("Failed to create chapter");
     } finally {
@@ -70,7 +74,7 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
         <Card className="border-dashed border-primary/50 bg-primary/5 animate-in fade-in slide-in-from-top-2">
           <CardContent className="p-4 flex items-center gap-4">
             <Input
-              placeholder="e.g. Introduction to React"
+              placeholder="e.g. Introduction to Physics"
               value={newChapterTitle}
               onChange={(e) => setNewChapterTitle(e.target.value)}
               autoFocus
@@ -87,7 +91,7 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
       )}
 
       <div className="space-y-4">
-        {chapters.map((chapter, index) => (
+        {chapters.map((chapter) => (
           <div
             key={chapter.id}
             className="group relative flex items-start gap-3 bg-card border border-border/50 rounded-xl p-4 hover:border-primary/20 transition-all"
@@ -100,12 +104,7 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-lg flex items-center gap-3">
                   {chapter.title}
-                  <Badge
-                    variant="outline"
-                    className="text-xs font-normal text-muted-foreground"
-                  >
-                    {chapter.videos.length} Lessons
-                  </Badge>
+                  <VideoStatus status={chapter.status} />
                 </h3>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -121,21 +120,37 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
                 </div>
               </div>
 
-              {/* Video List */}
+              {chapter.description && (
+                <p className="text-sm text-muted-foreground">
+                  {chapter.description}
+                </p>
+              )}
+
+              {/* Video Section */}
               <div className="pl-4 border-l-2 border-border/50 space-y-2 mt-4">
-                {chapter.videos.length === 0 ? (
-                  <div className="text-sm text-muted-foreground italic py-2">
-                    No lessons yet. Generate a video to start.
+                {chapter.videoUrl ? (
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <PlayCircle className="h-5 w-5 text-primary" />
+                      <div>
+                        <p className="font-medium text-sm">Video Generated</p>
+                        {chapter.duration && (
+                          <p className="text-xs text-muted-foreground">
+                            Duration: {Math.floor(chapter.duration / 60)}:{(chapter.duration % 60).toString().padStart(2, '0')}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={chapter.videoUrl} target="_blank" rel="noopener noreferrer">
+                        View
+                      </a>
+                    </Button>
                   </div>
                 ) : (
-                  chapter.videos.map((video) => (
-                    <VideoItem
-                      key={video.id}
-                      video={video}
-                      onEdit={() => {}}
-                      onDelete={() => {}}
-                    />
-                  ))
+                  <div className="text-sm text-muted-foreground italic py-2">
+                    No video yet. Generate one to start.
+                  </div>
                 )}
 
                 <div className="pt-2">
@@ -152,7 +167,7 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
                         className="w-full justify-start text-muted-foreground hover:text-primary"
                       >
                         <Plus className="mr-2 h-3.5 w-3.5" />
-                        Generate Video Lesson
+                        {chapter.videoUrl ? "Regenerate Video" : "Generate Video"}
                       </Button>
                     }
                   />

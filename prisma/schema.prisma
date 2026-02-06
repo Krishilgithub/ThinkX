@@ -7,173 +7,119 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  avatar    String?
-  bio       String?
-  role      String   @default("TEACHER") // TEACHER, STUDENT
+// Teacher Model - Only teachers can create courses
+model Teacher {
+  id     String  @id @default(uuid())
+  email  String  @unique
+  name   String
+  avatar String?
+  bio    String? @db.Text
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // Relations
-  courses       Course[]      @relation("CreatedCourses")
-  enrollments   Enrollment[]
-  notifications Notification[]
-  settings      Settings?
+  courses Course[]
 }
 
-model Settings {
-  id              String  @id @default(uuid())
-  userId          String  @unique
-  user            User    @relation(fields: [userId], references: [id])
-  emailNotify     Boolean @default(true)
-  studentNotify   Boolean @default(true)
-  marketingNotify Boolean @default(false)
-}
-
+// Course Model - Contains all video generation parameters
 model Course {
-  id          String   @id @default(uuid())
+  id String @id @default(uuid())
+
+  // Basic Info
   title       String
-  description String?  @db.Text
-  thumbnail   String?
-  price       Float    @default(0.0)
-  status      String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
-  visibility  String   @default("PUBLIC") // PUBLIC, PRIVATE
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  userId      String
-  user        User     @relation("CreatedCourses", fields: [userId], references: [id])
-  
-  chapters    Chapter[]
-  enrollments Enrollment[]
-  analytics   CourseAnalytics?
+  subject     String // e.g., "Mathematics", "Science", "History"
+  topic       String // Specific topic within the subject
+  description String? @db.Text
+
+  // Video Generation Parameters
+  duration Int // Duration in seconds
+  avatarId String // HeyGen avatar ID
+  voiceId  String // HeyGen voice ID
+
+  // Target Audience
+  targetAudience String // e.g., "Students", "Professionals", "Beginners"
+  ageGroup       String // e.g., "10-15", "16-20", "Adult"
+
+  // Style & Tone
+  style    String // e.g., "Professional", "Casual", "Educational"
+  tone     String // e.g., "Formal", "Friendly", "Motivational"
+  keywords String[] // Array of keywords for content generation
+
+  // Metadata
+  thumbnail String?
+  status    String  @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+
+  // Teacher Relation
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  // Course Content
+  chapters Chapter[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teacherId])
+  @@index([status])
 }
 
+// Chapter Model - Individual lessons/modules within a course
 model Chapter {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   title       String
-  orderIndex  Int      @default(0)
-  status      String   @default("DRAFT") // DRAFT, PUBLISHED
-  
-  courseId    String
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  
-  videos      Video[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Video {
-  id          String   @id @default(uuid())
-  title       String   // Renamed from 'topic' to title for consistency, can serve as topic
-  script      String?  @db.Text
-  videoUrl    String?
-  thumbnail   String?
-  muxPlaybackId String?
-  duration    Float?   // Duration in seconds
-  
-  // HeyGen Generation Metadata
-  heygenId    String?  // ID returned by HeyGen
-  status      String   @default("DRAFT") // DRAFT, PROCESSING, COMPLETED, FAILED
-  tone        String?
-  language    String?
-  avatarId    String?
-  voiceId     String?
-  visibility  String   @default("private") // private, public
-  
+  description String? @db.Text
   orderIndex  Int     @default(0)
-  
-  chapterId   String
-  chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  
-  analytics   VideoAnalytics?
-  jobs        VideoJob[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([chapterId])
+  // Video Information
+  videoUrl  String? // Generated video URL from HeyGen
+  thumbnail String?
+  duration  Int? // Actual duration in seconds
+  script    String? @db.Text // Generated script for the video
+
+  // Video Generation Status
+  status      String  @default("DRAFT") // DRAFT, GENERATING, COMPLETED, FAILED
+  heygenJobId String? // HeyGen video generation job ID
+
+  // Course Relation
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // Video Generation Jobs
+  jobs VideoJob[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+  @@index([status])
 }
 
+// VideoJob Model - Track video generation progress
 model VideoJob {
-  id            String   @id @default(uuid())
-  videoId       String
-  video         Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  
-  heygenJobId   String?
-  status        String   // PENDING, PROCESSING, COMPLETED, FAILED
-  progress      Int      @default(0)
-  error         String?
-  
-  startedAt     DateTime @default(now())
-  completedAt   DateTime?
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  @@index([videoId])
-}
+  id String @id @default(uuid())
 
-model Enrollment {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id])
-  
-  progress  Float    @default(0.0) // 0 to 100
-  joinedAt  DateTime @default(now())
+  chapterId String
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, courseId])
-}
+  heygenJobId String? // HeyGen API job ID
+  status      String  @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  progress    Int     @default(0) // 0 to 100
+  error       String? @db.Text
 
-model CourseAnalytics {
-  id             String @id @default(uuid())
-  courseId       String @unique
-  course         Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  
-  totalViews     Int    @default(0)
-  totalRevenue   Float  @default(0.0)
-  completionRate Float  @default(0.0)
-}
+  // Generation Parameters (snapshot for this job)
+  avatarId String?
+  voiceId  String?
+  script   String? @db.Text
 
-model VideoAnalytics {
-  id             String @id @default(uuid())
-  videoId        String @unique
-  video          Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  
-  views          Int    @default(0)
-  retentionChart Json?  // Stores retention graph data
-}
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
 
-model Resource {
-  id        String   @id @default(uuid())
-  name      String
-  type      String   // PDF, Image, Link, Doc
-  url       String
-  size      String?
-  date      DateTime @default(now())
-  
-  // Resources could be linked to a Course or User generally
-  userId    String? 
-  // user      User?    @relation(fields: [userId], references: [id]) // Optional link to owner
-}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-model Notification {
-  id        String   @id @default(uuid())
-  title     String
-  message   String
-  read      Boolean  @default(false)
-  date      DateTime @default(now())
-  
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  @@index([chapterId])
+  @@index([status])
 }

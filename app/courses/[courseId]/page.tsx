@@ -21,18 +21,7 @@ export default async function CoursePage({ params }: PageProps) {
     include: {
       chapters: {
         where: {
-          status: "PUBLISHED",
-        },
-        include: {
-          videos: {
-            where: {
-              status: "COMPLETED",
-              visibility: "public",
-            },
-            orderBy: {
-              orderIndex: "asc",
-            },
-          },
+          status: "COMPLETED",
         },
         orderBy: {
           orderIndex: "asc",
@@ -100,25 +89,28 @@ export default async function CoursePage({ params }: PageProps) {
                         {chapter.title}
                       </h4>
                       <div className="space-y-1">
-                        {chapter.videos.length === 0 ? (
-                          <div className="pl-4 text-xs text-gray-400 italic">
-                            No videos
+                        {!chapter.videoUrl ? (
+                          <div className="pl-4 text-xs text-gray-400 italic flex items-center">
+                            <Lock className="h-3 w-3 mr-1" />
+                            No video available
                           </div>
                         ) : (
-                          chapter.videos.map((video) => (
-                            <Link
-                              key={video.id}
-                              href={`/courses/${courseId}/lessons/${video.id}`}
-                              className="block"
-                            >
-                              <div className="flex items-center p-2 rounded-md hover:bg-gray-50 text-sm group cursor-pointer transition-colors">
-                                <PlayCircle className="h-4 w-4 mr-2 text-primary group-hover:text-primary/80" />
-                                <span className="text-gray-600 group-hover:text-gray-900">
-                                  {video.title}
+                          <Link
+                            href={`/courses/${courseId}/lessons/${chapter.id}`}
+                            className="block"
+                          >
+                            <div className="flex items-center p-2 rounded-md hover:bg-gray-50 text-sm group cursor-pointer transition-colors">
+                              <PlayCircle className="h-4 w-4 mr-2 text-primary group-hover:text-primary/80" />
+                              <span className="text-gray-600 group-hover:text-gray-900">
+                                Watch Video
+                              </span>
+                              {chapter.duration && (
+                                <span className="ml-auto text-xs text-gray-400">
+                                  {Math.floor(chapter.duration / 60)}:{(chapter.duration % 60).toString().padStart(2, '0')}
                                 </span>
-                              </div>
-                            </Link>
-                          ))
+                              )}
+                            </div>
+                          </Link>
                         )}
                       </div>
                     </div>

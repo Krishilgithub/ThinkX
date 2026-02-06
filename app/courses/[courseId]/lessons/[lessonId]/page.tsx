@@ -21,18 +21,7 @@ export default async function LessonPage({ params }: PageProps) {
     include: {
       chapters: {
         where: {
-          status: "PUBLISHED",
-        },
-        include: {
-          videos: {
-            where: {
-              status: "COMPLETED",
-              visibility: "public",
-            },
-            orderBy: {
-              orderIndex: "asc",
-            },
-          },
+          status: "COMPLETED",
         },
         orderBy: {
           orderIndex: "asc",
@@ -41,13 +30,13 @@ export default async function LessonPage({ params }: PageProps) {
     },
   });
 
-  const currentVideo = await db.video.findUnique({
+  const currentChapter = await db.chapter.findUnique({
     where: {
       id: lessonId,
     },
   });
 
-  if (!course || !currentVideo) {
+  if (!course || !currentChapter) {
     return redirect("/");
   }
 
@@ -74,11 +63,11 @@ export default async function LessonPage({ params }: PageProps) {
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-white rounded-lg border p-6 shadow-sm">
               <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
-                {currentVideo.videoUrl ? (
+                {currentChapter.videoUrl ? (
                   <video
                     controls
                     className="w-full h-full"
-                    src={currentVideo.videoUrl}
+                    src={currentChapter.videoUrl}
                     autoPlay
                   />
                 ) : (
@@ -88,8 +77,16 @@ export default async function LessonPage({ params }: PageProps) {
                 )}
               </div>
               <div className="mt-6">
-                <h2 className="text-2xl font-bold">{currentVideo.title}</h2>
-                <p className="text-gray-500 mt-2">{currentVideo.script}</p>
+                <h2 className="text-2xl font-bold">{currentChapter.title}</h2>
+                {currentChapter.description && (
+                  <p className="text-gray-500 mt-2">{currentChapter.description}</p>
+                )}
+                {currentChapter.script && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h3 className="font-semibold text-sm text-gray-700 mb-2">Transcript</h3>
+                    <p className="text-sm text-gray-600 whitespace-pre-wrap">{currentChapter.script}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -100,18 +97,17 @@ export default async function LessonPage({ params }: PageProps) {
                 <h3 className="font-semibold">Course Content</h3>
               </div>
               <div className="p-4 space-y-4">
-                {course.chapters.map((chapter) => (
-                  <div key={chapter.id} className="space-y-2">
-                    <h4 className="font-medium text-sm text-gray-900">
-                      {chapter.title}
-                    </h4>
-                    <div className="space-y-1">
-                      {chapter.videos.map((video) => {
-                        const isActive = video.id === lessonId;
-                        return (
+                {course.chapters.map((chapter) => {
+                  const isActive = chapter.id === lessonId;
+                  return (
+                    <div key={chapter.id} className="space-y-2">
+                      <h4 className="font-medium text-sm text-gray-900">
+                        {chapter.title}
+                      </h4>
+                      <div className="space-y-1">
+                        {chapter.videoUrl ? (
                           <Link
-                            key={video.id}
-                            href={`/courses/${courseId}/lessons/${video.id}`}
+                            href={`/courses/${courseId}/lessons/${chapter.id}`}
                             className="block"
                           >
                             <div
@@ -121,15 +117,24 @@ export default async function LessonPage({ params }: PageProps) {
                                 className={`h-4 w-4 mr-2 ${isActive ? "text-primary" : "text-gray-400 group-hover:text-gray-600"}`}
                               />
                               <span className={isActive ? "font-medium" : ""}>
-                                {video.title}
+                                Watch Video
                               </span>
+                              {chapter.duration && (
+                                <span className="ml-auto text-xs text-gray-400">
+                                  {Math.floor(chapter.duration / 60)}:{(chapter.duration % 60).toString().padStart(2, '0')}
+                                </span>
+                              )}
                             </div>
                           </Link>
-                        );
-                      })}
+                        ) : (
+                          <div className="pl-6 text-xs text-gray-400 italic py-2">
+                            No video available
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

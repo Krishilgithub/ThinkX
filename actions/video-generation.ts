@@ -9,18 +9,12 @@ export async function createVideoJob(
   params: CreateVideoParams,
 ) {
   try {
-    // 1. Create the Video record in DRAFT/PROCESSING state
-    const video = await db.video.create({
+    // 1. Update Chapter to GENERATING status
+    const chapter = await db.chapter.update({
+      where: { id: chapterId },
       data: {
-        chapterId,
-        title: params.title,
-        status: "PROCESSING", // Optimistic status
-        heygenId: "pending", // Will update after API call
-        tone: params.tone,
-        language: params.language,
-        avatarId: params.avatarId,
-        voiceId: params.voiceId,
-        visibility: params.visibility || "private",
+        status: "GENERATING",
+        script: params.script || null,
       },
     });
 
@@ -29,64 +23,67 @@ export async function createVideoJob(
     try {
       heyGenId = await heyGenService.generateVideo(params);
     } catch (apiError: any) {
-      // If API fails, mark video as FAILED
-      await db.video.update({
-        where: { id: video.id },
+      // If API fails, mark chapter as FAILED
+      await db.chapter.update({
+        where: { id: chapterId },
         data: { status: "FAILED" },
       });
       return { error: apiError.message || "Failed to start video generation" };
     }
 
-    // 3. Update Video with real HeyGen ID
-    await db.video.update({
-      where: { id: video.id },
-      data: { heygenId: heyGenId },
+    // 3. Update Chapter with HeyGen job ID
+    await db.chapter.update({
+      where: { id: chapterId },
+      data: { heygenJobId: heyGenId },
     });
 
     // 4. Create a Job record to track this specific generation attempt
     await db.videoJob.create({
       data: {
-        videoId: video.id,
+        chapterId: chapterId,
         heygenJobId: heyGenId,
         status: "PROCESSING",
+        avatarId: params.avatarId,
+        voiceId: params.voiceId,
+        script: params.script,
       },
     });
 
     revalidatePath(`/dashboard/courses`);
-    return { success: true, videoId: video.id, jobId: heyGenId };
+    return { success: true, chapterId: chapterId, jobId: heyGenId };
   } catch (error: any) {
     console.error("createVideoJob Error:", error);
     return { error: "Internal Server Error" };
   }
 }
 
-export async function pollVideoStatus(videoId: string) {
+export async function pollVideoStatus(chapterId: string) {
   try {
-    const video = await db.video.findUnique({
-      where: { id: videoId },
+    const chapter = await db.chapter.findUnique({
+      where: { id: chapterId },
       include: { jobs: { orderBy: { createdAt: "desc" }, take: 1 } },
     });
 
-    if (!video || !video.heygenId) {
+    if (!chapter || !chapter.heygenJobId) {
       return { status: "NOT_FOUND" };
     }
 
     // If already completed, just return
-    if (video.status === "COMPLETED" || video.status === "FAILED") {
+    if (chapter.status === "COMPLETED" || chapter.status === "FAILED") {
       return {
-        status: video.status,
-        videoUrl: video.videoUrl,
-        thumbnail: video.thumbnail,
+        status: chapter.status,
+        videoUrl: chapter.videoUrl,
+        thumbnail: chapter.thumbnail,
       };
     }
 
     // Check status with HeyGen
-    const statusData = await heyGenService.checkStatus(video.heygenId);
+    const statusData = await heyGenService.checkStatus(chapter.heygenJobId);
 
     // Update DB if status changed
-    if (statusData.status !== video.status.toLowerCase()) {
-      await db.video.update({
-        where: { id: videoId },
+    if (statusData.status !== chapter.status.toLowerCase()) {
+      await db.chapter.update({
+        where: { id: chapterId },
         data: {
           status: statusData.status.toUpperCase(),
           videoUrl: statusData.video_url,
@@ -96,9 +93,9 @@ export async function pollVideoStatus(videoId: string) {
       });
 
       // Also update the job record
-      if (video.jobs[0]) {
+      if (chapter.jobs[0]) {
         await db.videoJob.update({
-          where: { id: video.jobs[0].id },
+          where: { id: chapter.jobs[0].id },
           data: {
             status: statusData.status.toUpperCase(),
             error: statusData.error,

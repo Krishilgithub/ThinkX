@@ -2,39 +2,22 @@
 
 import { db } from "@/lib/db";
 
-// Hardcoded for demo - in real app would get from session
+// Hardcoded for demo - in real app would get from session/auth
 const DEMO_EMAIL = "demo@thinkx.ai";
 
 export async function getDemoUser() {
-  const user = await db.user.findUnique({
+  const teacher = await db.teacher.findUnique({
     where: { email: DEMO_EMAIL },
-    include: {
-      settings: true,
-    },
   });
-  return user;
+  return teacher;
 }
 
-export async function updateSettings(data: {
-  emailNotify?: boolean;
-  studentNotify?: boolean;
-  marketingNotify?: boolean;
-}) {
-  const user = await getDemoUser();
-  if (!user) return null;
+export async function updateProfile(data: { name?: string; bio?: string; avatar?: string }) {
+  const teacher = await getDemoUser();
+  if (!teacher) return null;
 
-  return await db.settings.update({
-    where: { userId: user.id },
-    data: data,
-  });
-}
-
-export async function updateProfile(data: { name?: string; bio?: string }) {
-  const user = await getDemoUser();
-  if (!user) return null;
-
-  return await db.user.update({
-    where: { id: user.id },
+  return await db.teacher.update({
+    where: { id: teacher.id },
     data: data,
   });
 }

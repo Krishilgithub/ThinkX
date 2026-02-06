@@ -4,37 +4,30 @@ import { db } from "@/lib/db";
 import { getDemoUser } from "./user";
 
 export async function getAnalyticsOverview() {
-  const user = await getDemoUser();
-  if (!user) return null;
+  const teacher = await getDemoUser();
+  if (!teacher) return null;
 
   try {
     const courses = await db.course.findMany({
-      where: { userId: user.id },
-      include: { analytics: true },
+      where: { teacherId: teacher.id },
+      include: {
+        chapters: {
+          where: { status: "COMPLETED" },
+        },
+      },
     });
 
     // Calculate high-level stats
-    const totalViews = courses.reduce(
-      (acc: number, c: any) => acc + (c.analytics?.totalViews || 0),
-      0,
-    );
+    const totalCourses = courses.length;
+    const publishedCourses = courses.filter(c => c.status === "PUBLISHED").length;
+    const totalChapters = courses.reduce((acc, c) => acc + c.chapters.length, 0);
+    
+    // Mock analytics data (in production, you'd track actual views)
+    const totalViews = publishedCourses * 150; // Mock: avg 150 views per published course
+    const totalWatchTime = totalViews * 300; // Mock: avg 5 min watch time
+    const avgEngagement = publishedCourses > 0 ? Math.round((totalChapters / publishedCourses) * 15) : 0; // Mock engagement
 
-    // totalWatchTime is not in schema yet, mocking based on views * avg duration (e.g. 5 mins -> 300s)
-    const totalWatchTime = totalViews * 300;
-
-    // Avg Engagement
-    const engagementSum = courses.reduce(
-      (acc: number, c: any) => acc + (c.analytics?.completionRate || 0),
-      0,
-    );
-
-    const measuredCourses = courses.filter(
-      (c: any) => c.analytics !== null,
-    ).length;
-    const avgEngagement =
-      measuredCourses > 0 ? Math.round(engagementSum / measuredCourses) : 0;
-
-    // Mocking time-series data for the chart because we don't store daily views yet
+    // Mock time-series data for the chart
     const viewsOverTime = [
       { month: "Jan", views: Math.floor(totalViews * 0.1) },
       { month: "Feb", views: Math.floor(totalViews * 0.15) },

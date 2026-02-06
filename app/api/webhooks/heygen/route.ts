@@ -12,22 +12,22 @@ export async function POST(req: Request) {
       const { video_id, status, video_url, thumbnail_url, duration, error } =
         event_data;
 
-      // Find video by HeyGen ID
-      const video = await db.video.findFirst({
-        where: { heygenId: video_id },
+      // Find chapter by HeyGen job ID
+      const chapter = await db.chapter.findFirst({
+        where: { heygenJobId: video_id },
       });
 
-      if (!video) {
-        console.warn(`Video not found for HeyGen ID: ${video_id}`);
+      if (!chapter) {
+        console.warn(`Chapter not found for HeyGen ID: ${video_id}`);
         return NextResponse.json(
-          { message: "Video not found" },
+          { message: "Chapter not found" },
           { status: 404 },
         );
       }
 
-      // Update Video
-      await db.video.update({
-        where: { id: video.id },
+      // Update Chapter
+      await db.chapter.update({
+        where: { id: chapter.id },
         data: {
           status: status.toUpperCase(),
           videoUrl: video_url,
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
       // Update latest Job
       const latestJob = await db.videoJob.findFirst({
-        where: { videoId: video.id },
+        where: { chapterId: chapter.id },
         orderBy: { createdAt: "desc" },
       });
 
