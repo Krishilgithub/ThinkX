@@ -51,9 +51,24 @@ const formSchema = z.object({
   tone: z.string().default("professional"),
   language: z.string().default("en"),
   avatarId: z.string().default("default-avatar"),
-  background: z.string().default("default-background"),
+  background: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, "Must be a valid HEX color (#RRGGBB)")
+    .default("#FFFFFF"),
   visibility: z.string().default("private"),
 });
+
+// Preset color palette for quick selection
+const PRESET_COLORS = [
+  { name: "White", value: "#FFFFFF" },
+  { name: "Light Blue", value: "#E3F2FD" },
+  { name: "Light Green", value: "#E8F5E9" },
+  { name: "Light Purple", value: "#F3E5F5" },
+  { name: "Light Orange", value: "#FFF3E0" },
+  { name: "Dark Blue", value: "#1E3A8A" },
+  { name: "Dark Green", value: "#166534" },
+  { name: "Black", value: "#000000" },
+];
 
 interface GenerateVideoModalProps {
   chapterId: string;
@@ -79,7 +94,7 @@ export function GenerateVideoModal({
       tone: "professional",
       language: "en",
       avatarId: "default-avatar",
-      background: "default-background",
+      background: "#FFFFFF",
       visibility: "private",
     },
   });
@@ -160,6 +175,59 @@ export function GenerateVideoModal({
                   </FormControl>
                   <FormDescription>
                     Maximum 500 characters. Detailed scripts work best.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="background"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Background Color</FormLabel>
+                  <FormControl>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={field.value}
+                          onChange={field.onChange}
+                          className="h-10 w-20 rounded border cursor-pointer"
+                        />
+                        <Input
+                          type="text"
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="#FFFFFF"
+                          className="flex-1 font-mono uppercase"
+                          maxLength={7}
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 gap-2">
+                        {PRESET_COLORS.map((color) => (
+                          <button
+                            key={color.value}
+                            type="button"
+                            onClick={() => field.onChange(color.value)}
+                            className="flex items-center gap-2 p-2 rounded border hover:bg-accent transition-colors text-sm"
+                            title={color.name}
+                          >
+                            <div
+                              className="w-6 h-6 rounded border"
+                              style={{ backgroundColor: color.value }}
+                            />
+                            <span className="text-xs truncate">
+                              {color.name}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    Choose a background color for your video
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

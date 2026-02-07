@@ -21,6 +21,25 @@ export interface HeyGenJobStatus {
 // Mock implementation for development without API key
 const MOCK_DELAY = 5000; // 5 seconds to simulate processing
 
+/**
+ * Validates a HEX color string against HeyGen API requirements
+ * @param color - Color string to validate
+ * @returns Valid HEX color or default fallback
+ */
+function validateHexColor(color: string | undefined): string {
+  const HEX_COLOR_REGEX = /^#[0-9a-fA-F]{6}$/;
+  const DEFAULT_COLOR = "#FFFFFF";
+
+  if (!color || !HEX_COLOR_REGEX.test(color)) {
+    console.warn(
+      `[HeyGen] Invalid background color "${color}", using fallback: ${DEFAULT_COLOR}`,
+    );
+    return DEFAULT_COLOR;
+  }
+
+  return color;
+}
+
 export class HeyGenService {
   private apiKey: string;
   private isMock: boolean;
@@ -30,6 +49,31 @@ export class HeyGenService {
     this.isMock = !this.apiKey; // Only mock if no key is provided
   }
 
+  async getVoices(): Promise<any[]> {
+    if (this.isMock) {
+      return [{ voice_id: "mock_voice", name: "Mock Voice" }];
+    }
+
+    try {
+      const response = await fetch("https://api.heygen.com/v2/voices", {
+        headers: {
+          "X-Api-Key": this.apiKey,
+        },
+      });
+
+      if (!response.ok) {
+        console.error("Failed to fetch voices:", response.statusText);
+        return [];
+      }
+
+      const data = await response.json();
+      return data.data?.voices || [];
+    } catch (error) {
+      console.error("Error fetching voices:", error);
+      return [];
+    }
+  }
+
   async generateVideo(params: CreateVideoParams): Promise<string> {
     if (this.isMock) {
       console.log("[HeyGen Mock] Generating video:", params);
@@ -37,6 +81,17 @@ export class HeyGenService {
     }
 
     try {
+      // Fetch available voices
+      const voices = await this.getVoices();
+      const defaultVoice =
+        voices.find((v) => v.language === "English") || voices[0];
+      const voiceId =
+        params.voiceId ||
+        defaultVoice?.voice_id ||
+        "1bd001e7e50f421d891986aad5158bc8";
+
+      console.log("[HeyGen] Using voice_id:", voiceId);
+
       const payload = {
         video_inputs: [
           {
@@ -47,14 +102,12 @@ export class HeyGenService {
             },
             voice: {
               type: "text",
-              text: {
-                voice_id: params.voiceId || "2d5b0e6cf361460aa7fc47e3eee4bab2",
-                input_text: params.description || params.title,
-              },
+              voice_id: voiceId,
+              input_text: params.description || params.title,
             },
             background: {
               type: "color",
-              value: params.background || "#ffffff",
+              value: validateHexColor(params.background),
             },
           },
         ],
