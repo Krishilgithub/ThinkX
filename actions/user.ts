@@ -1,40 +1,14 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { getCurrentUser } from "@/actions/auth";
 
-// Hardcoded for demo - in real app would get from session
-const DEMO_EMAIL = "demo@thinkx.ai";
+export async function updateProfile(data: { name?: string; bio?: string; avatar?: string }) {
+  const teacher = await getCurrentUser();
+  if (!teacher) return null;
 
-export async function getDemoUser() {
-  const user = await db.user.findUnique({
-    where: { email: DEMO_EMAIL },
-    include: {
-      settings: true,
-    },
-  });
-  return user;
-}
-
-export async function updateSettings(data: {
-  emailNotify?: boolean;
-  studentNotify?: boolean;
-  marketingNotify?: boolean;
-}) {
-  const user = await getDemoUser();
-  if (!user) return null;
-
-  return await db.settings.update({
-    where: { userId: user.id },
-    data: data,
-  });
-}
-
-export async function updateProfile(data: { name?: string; bio?: string }) {
-  const user = await getDemoUser();
-  if (!user) return null;
-
-  return await db.user.update({
-    where: { id: user.id },
+  return await db.teacher.update({
+    where: { id: teacher.id },
     data: data,
   });
 }

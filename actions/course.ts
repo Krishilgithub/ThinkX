@@ -1,26 +1,23 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { getDemoUser } from "./user";
+import { getCurrentUser } from "./auth";
 
 export async function getCourses() {
-  const user = await getDemoUser();
-  if (!user) return [];
+  const teacher = await getCurrentUser();
+  if (!teacher) return [];
 
   try {
     const courses = await db.course.findMany({
-      where: { userId: user.id },
+      where: { teacherId: teacher.id },
       orderBy: { updatedAt: "desc" },
       include: {
         _count: {
           select: {
             chapters: true,
-            enrollments: true,
           },
         },
-        analytics: true,
       },
     });
 
@@ -32,18 +29,17 @@ export async function getCourses() {
 }
 
 export async function getRecentCourses(limit: number = 5) {
-  const user = await getDemoUser();
-  if (!user) return [];
+  const teacher = await getCurrentUser();
+  if (!teacher) return [];
 
   try {
     return await db.course.findMany({
-      where: { userId: user.id },
+      where: { teacherId: teacher.id },
       orderBy: { updatedAt: "desc" },
       take: limit,
       include: {
-        analytics: true,
         _count: {
-          select: { chapters: true, enrollments: true },
+          select: { chapters: true },
         },
       },
     });
@@ -55,17 +51,26 @@ export async function getRecentCourses(limit: number = 5) {
 
 export async function createCourse(data: {
   title: string;
+  subject: string;
+  topic: string;
   description?: string;
+  duration: number;
+  avatarId: string;
+  voiceId: string;
+  targetAudience: string;
+  ageGroup: string;
+  style: string;
+  tone: string;
+  keywords: string[];
 }) {
-  const user = await getDemoUser();
-  if (!user) throw new Error("Unauthorized");
+  const teacher = await getCurrentUser();
+  if (!teacher) throw new Error("Unauthorized");
 
   try {
     const newCourse = await db.course.create({
       data: {
-        title: data.title,
-        description: data.description,
-        userId: user.id,
+        ...data,
+        teacherId: teacher.id,
         status: "DRAFT",
       },
     });
@@ -79,8 +84,8 @@ export async function createCourse(data: {
 }
 
 export async function getCourseById(id: string) {
-  const user = await getDemoUser();
-  if (!user) return null;
+  const teacher = await getCurrentUser();
+  if (!teacher) return null;
 
   try {
     return await db.course.findUnique({
@@ -88,13 +93,7 @@ export async function getCourseById(id: string) {
       include: {
         chapters: {
           orderBy: { orderIndex: "asc" },
-          include: {
-            videos: {
-              orderBy: { createdAt: "asc" }, // Need to add orderIndex to Video later if needed
-            },
-          },
         },
-        analytics: true,
       },
     });
   } catch (error) {

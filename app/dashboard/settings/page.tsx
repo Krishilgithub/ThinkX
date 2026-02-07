@@ -1,12 +1,13 @@
 export const dynamic = "force-dynamic";
-import { getDemoUser } from "@/actions/user";
+import { getCurrentUser } from "@/actions/auth";
 import { SettingsForm } from "@/components/dashboard/SettingsForm";
+import { redirect } from "next/navigation";
 
 export default async function SettingsPage() {
-  const user = await getDemoUser();
+  const user = await getCurrentUser();
 
   if (!user) {
-    return <div>User not found. Please seed the database.</div>;
+    redirect("/login");
   }
 
   return (

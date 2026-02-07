@@ -1,9 +1,6 @@
 export const dynamic = "force-dynamic";
 import { KpiGrid } from "@/components/dashboard/KpiGrid";
-import { ActivityChart } from "@/components/dashboard/ActivityChart";
-// import { LessonsTable } from "@/components/dashboard/LessonsTable"; // Refactor to CourseGrid later
 import { QuickActions } from "@/components/dashboard/QuickActions";
-import { InsightsPanel } from "@/components/dashboard/InsightsPanel";
 import { TasksList } from "@/components/dashboard/TasksList";
 
 import { getAnalyticsOverview } from "@/actions/analytics";
@@ -31,23 +28,7 @@ export default async function DashboardPage() {
         <KpiGrid stats={stats} />
       </section>
 
-      {/* Section 2: Activity & Performance */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          {stats ? (
-            <ActivityChart data={stats.viewsOverTime} />
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              No data available
-            </div>
-          )}
-        </div>
-        <div className="lg:col-span-1">
-          <InsightsPanel />
-        </div>
-      </section>
-
-      {/* Section 3: Quick Actions & Tasks */}
+      {/* Section 2: Quick Actions & Tasks */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
           <QuickActions />

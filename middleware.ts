@@ -1,0 +1,59 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
+
+const JWT_SECRET = new TextEncoder().encode(
+    process.env.JWT_SECRET || "your-secret-key-change-this-in-production"
+);
+
+export async function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl;
+
+    // Get session token
+    const sessionCookie = request.cookies.get("session");
+
+    // Protected routes
+    const isProtectedRoute = pathname.startsWith("/dashboard");
+    const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/signup");
+
+    // If trying to access protected route without session
+    if (isProtectedRoute && !sessionCookie) {
+        const loginUrl = new URL("/login", request.url);
+        return NextResponse.redirect(loginUrl);
+    }
+
+    // Verify session token
+    if (sessionCookie) {
+        try {
+            await jwtVerify(sessionCookie.value, JWT_SECRET);
+
+            // If logged in and trying to access auth pages, redirect to dashboard
+            if (isAuthRoute) {
+                const dashboardUrl = new URL("/dashboard", request.url);
+                return NextResponse.redirect(dashboardUrl);
+            }
+        } catch (error) {
+            // Invalid token, clear it and redirect to login if on protected route
+            if (isProtectedRoute) {
+                const response = NextResponse.redirect(new URL("/login", request.url));
+                response.cookies.delete("session");
+                return response;
+            }
+        }
+    }
+
+    return NextResponse.next();
+}
+
+export const config = {
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - api (API routes)
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         */
+        "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    ],
+};
