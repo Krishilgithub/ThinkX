@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Assuming Avatar UI exists or I'll implement inline if missing
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 
 const testimonials = [
@@ -31,10 +31,10 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-background transition-colors duration-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-zinc-900">
+          <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-foreground">
             Loved by <span className="text-primary">educators</span>
           </h2>
         </div>
@@ -49,29 +49,30 @@ export function Testimonials() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               whileHover={{ y: -5 }}
             >
-              <Card className="h-full bg-zinc-50 border-zinc-200 hover:border-primary/30 hover:shadow-lg transition-all shadow-sm">
+              <Card className="h-full bg-muted/30 dark:bg-muted/10 border-border hover:border-primary/30 hover:shadow-lg transition-all shadow-sm">
                 <CardContent className="pt-8 px-6 pb-8">
                   <Quote className="w-10 h-10 text-primary/20 mb-6" />
-                  <p className="text-lg text-zinc-700 mb-8 leading-relaxed">
+                  <p className="text-lg text-foreground mb-8 leading-relaxed">
                     &quot;{testimonial.content}&quot;
                   </p>
 
                   <div className="flex items-center gap-4">
-                    <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+                    <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
                       <AvatarImage
                         src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${testimonial.initials}`}
+                        alt={testimonial.name}
                       />
-                      <AvatarFallback className="bg-green-100 text-primary font-bold">
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                         {testimonial.initials}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h4 className="font-bold text-zinc-900">
+                      <div className="font-semibold text-foreground">
                         {testimonial.name}
-                      </h4>
-                      <p className="text-sm text-zinc-500">
+                      </div>
+                      <div className="text-sm text-muted-foreground">
                         {testimonial.role}
-                      </p>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
