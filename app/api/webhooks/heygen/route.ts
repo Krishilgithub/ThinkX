@@ -42,7 +42,10 @@ export async function POST(req: Request) {
   try {
     // 1. Get signature and payload
     const headersList = await headers();
-    const signature = headersList.get("x-heygen-signature") || "";
+    const signature =
+      headersList.get("x-heygen-signature") ||
+      headersList.get("X-HeyGen-Signature") ||
+      "";
     const payload = await req.text();
 
     // 2. Verify signature in production

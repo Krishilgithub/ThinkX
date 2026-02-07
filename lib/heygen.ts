@@ -8,6 +8,7 @@ export interface CreateVideoParams {
   voiceId?: string;
   background?: string;
   visibility?: string;
+  caption?: boolean;
 }
 
 export interface HeyGenJobStatus {
@@ -130,12 +131,14 @@ export class HeyGenService {
 
       console.log("[HeyGen] Using voice_id:", voiceId);
 
+      const isTestMode = process.env.HEYGEN_TEST_MODE === "true";
+
       const payload = {
         video_inputs: [
           {
             character: {
               type: "avatar",
-              avatar_id: finalAvatarId, // ✅ Now using validated avatar ID
+              avatar_id: finalAvatarId, // ✅ Using validated avatar ID
               avatar_style: "normal",
             },
             voice: {
@@ -149,13 +152,13 @@ export class HeyGenService {
             },
           },
         ],
-        test: true,
-        caption: false,
+        test: isTestMode,
+        caption: params.caption ?? false,
         title: params.title,
       };
 
       console.log(
-        "[HeyGen] Sending payload:",
+        `[HeyGen] Sending payload (Test Mode: ${isTestMode}):`,
         JSON.stringify(payload, null, 2),
       );
 

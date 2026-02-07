@@ -113,8 +113,23 @@ export function GenerateVideoModal({
   useEffect(() => {
     if (!isPolling) return;
 
+    let attempts = 0;
+    const MAX_ATTEMPTS = 120; // 10 minutes (120 * 5s)
+
     const pollInterval = setInterval(async () => {
+      attempts++;
+
       try {
+        if (attempts >= MAX_ATTEMPTS) {
+          setIsPolling(false);
+          clearInterval(pollInterval);
+          toast.error("Generation Timeout", {
+            description:
+              "Video generation is taking longer than expected. Please check back later.",
+          });
+          return;
+        }
+
         const result = await pollVideoStatus(chapterId);
 
         if (result.error) {
