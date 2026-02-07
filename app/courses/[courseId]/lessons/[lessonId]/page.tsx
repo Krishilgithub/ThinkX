@@ -5,14 +5,14 @@ import { ArrowLeft, PlayCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     courseId: string;
     lessonId: string;
-  };
+  }>;
 }
 
 export default async function LessonPage({ params }: PageProps) {
-  const { courseId, lessonId } = params;
+  const { courseId, lessonId } = await params;
 
   const course = await db.course.findUnique({
     where: {
