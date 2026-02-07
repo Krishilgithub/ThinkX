@@ -6,12 +6,8 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   BookOpen,
-  PlusCircle,
   Library,
-  CreditCard,
-  HelpCircle,
   Zap,
-  MoreVertical,
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,13 +18,7 @@ import { useRouter } from "next/navigation";
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: BookOpen, label: "My Courses", href: "/dashboard/courses" },
-  { icon: PlusCircle, label: "Create Lesson", href: "/dashboard/create" },
   { icon: Library, label: "Library", href: "/dashboard/library" },
-  { icon: CreditCard, label: "Billing", href: "/dashboard/billing" },
-];
-
-const secondaryItems = [
-  { icon: HelpCircle, label: "Help", href: "/dashboard/help" },
 ];
 
 interface SidebarProps {
@@ -84,32 +74,6 @@ export function Sidebar({ user }: SidebarProps) {
               "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground group",
               pathname === item.href
                 ? "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
-                : "text-muted-foreground",
-            )}
-          >
-            <item.icon
-              className={cn(
-                "h-5 w-5",
-                pathname === item.href
-                  ? "text-primary"
-                  : "text-muted-foreground group-hover:text-foreground",
-              )}
-            />
-            <span>{item.label}</span>
-          </Link>
-        ))}
-      </div>
-
-      {/* Secondary Nav */}
-      <div className="px-3 py-2 space-y-1 mt-auto border-t border-border/50 pt-4">
-        {secondaryItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground group",
-              pathname === item.href
-                ? "bg-primary/10 text-primary"
                 : "text-muted-foreground",
             )}
           >
