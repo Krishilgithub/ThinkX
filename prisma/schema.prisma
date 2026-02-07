@@ -99,32 +99,79 @@ model Chapter {
   @@index([status])
 }
 
-// VideoJob Model - Track video generation progress
+// VideoJob Model - Track video generation progress (Production-Ready)
 model VideoJob {
   id String @id @default(uuid())
 
+  // Relations
   chapterId String
   chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
-  heygenJobId String? // HeyGen API job ID
-  status      String  @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
-  progress    Int     @default(0) // 0 to 100
+  // HeyGen Integration
+  heygenJobId String? @unique // HeyGen API job ID
+  
+  // Status Tracking
+  status      String  @default("PENDING") // PENDING | PROCESSING | COMPLETED | FAILED | CANCELLED
+  progress    Int     @default(0) // 0-100
   error       String? @db.Text
-
+  errorCode   String? // Structured error codes (e.g., API_ERROR, TIMEOUT, INVALID_PARAMS)
+  
+  // Retry Logic
+  retryCount  Int      @default(0)
+  maxRetries  Int      @default(3)
+  nextRetryAt DateTime?
+  
+  // Video Output
+  videoUrl      String? // Final CDN URL (Cloudinary)
+  thumbnailUrl  String?
+  duration      Int? // Duration in seconds
+  fileSize      Int? // File size in bytes
+  
   // Generation Parameters (snapshot for this job)
-  avatarId String?
-  voiceId  String?
-  script   String? @db.Text
-
-  startedAt   DateTime  @default(now())
+  avatarId   String?
+  voiceId    String?
+  script     String? @db.Text
+  background String? // HEX color
+  language   String? // e.g., "en", "es"
+  
+  // Webhook Tracking
+  webhookReceivedAt DateTime?
+  webhookPayload    Json? // Store full webhook data for debugging
+  
+  // Timestamps
+  startedAt   DateTime?
   completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Relations
+  events JobEvent[]
 
   @@index([chapterId])
   @@index([status])
+  @@index([heygenJobId])
+  @@index([nextRetryAt])
+  @@index([createdAt])
 }
+
+// JobEvent Model - Audit trail for video generation jobs
+model JobEvent {
+  id String @id @default(uuid())
+  
+  jobId     String
+  job       VideoJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  eventType String // CREATED | QUEUED | PROCESSING | RETRY | COMPLETED | FAILED | WEBHOOK_RECEIVED | POLLING
+  message   String? @db.Text
+  metadata  Json? // Additional context (user_id, worker_id, etc.)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([jobId])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
 
 // HeyGen Avatar Model - Cache available avatars from HeyGen API
 model HeyGenAvatar {
