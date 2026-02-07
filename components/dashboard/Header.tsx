@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Search, Plus } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -60,21 +60,6 @@ export function Header({ user }: HeaderProps) {
       </div>
 
       <div className="ml-auto flex items-center gap-4">
-        {/* Credits Badge */}
-        <div className="hidden md:flex items-center px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
-          <span className="text-xs font-semibold text-primary mr-1">1,250</span>
-          <span className="text-xs text-muted-foreground">credits left</span>
-        </div>
-
-        {/* Quick Action */}
-        <Button
-          size="sm"
-          className="hidden md:flex gap-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm shadow-primary/20"
-        >
-          <Plus className="h-4 w-4" />
-          Quick Create
-        </Button>
-
         {/* Notifications */}
         <Button
           variant="ghost"

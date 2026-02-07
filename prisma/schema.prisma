@@ -53,6 +53,7 @@ model Course {
   // Metadata
   thumbnail String?
   status    String  @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  isTemplate Boolean @default(false) // Mark as template/sample video for all users
 
   // Teacher Relation
   teacherId String

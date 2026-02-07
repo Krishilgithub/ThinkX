@@ -16,46 +16,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export default function CreatePage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Form state
+  // Simplified form state - only title and description
   const [formData, setFormData] = useState({
     title: "",
-    subject: "",
-    topic: "",
     description: "",
-    duration: "600",
-    avatarId: "avatar_001",
-    voiceId: "voice_en_us_female_01",
-    targetAudience: "Students",
-    ageGroup: "16-20",
-    style: "Educational",
-    tone: "Friendly",
-    keywords: "",
   });
 
   const handleCreateCourse = async () => {
-    if (!formData.title || !formData.subject || !formData.topic) {
-      toast.error("Please fill in all required fields");
+    if (!formData.title) {
+      toast.error("Please enter a course title");
       return;
     }
 
     setLoading(true);
     try {
       const course = await createCourse({
-        ...formData,
-        duration: parseInt(formData.duration),
-        keywords: formData.keywords.split(",").map(k => k.trim()).filter(Boolean),
+        title: formData.title,
+        subject: "General",
+        topic: formData.title,
+        description: formData.description,
+        duration: 600,
+        avatarId: "avatar_001",
+        voiceId: "voice_en_us_female_01",
+        targetAudience: "Students",
+        ageGroup: "16-20",
+        style: "Educational",
+        tone: "Friendly",
+        keywords: [],
       });
       toast.success("Course created!");
       router.push(`/dashboard/courses/${course.id}`);
@@ -77,7 +69,7 @@ export default function CreatePage() {
           Create New Course
         </h1>
         <p className="text-muted-foreground">
-          Fill in the details for your video course. AI will generate content based on these parameters.
+          Start by giving your course a title and description
         </p>
       </div>
 
@@ -85,153 +77,30 @@ export default function CreatePage() {
         <CardHeader>
           <CardTitle>Course Details</CardTitle>
           <CardDescription>
-            Provide the basic information for your course
+            Enter the course title and a brief description
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2 md:col-span-2">
-                <Label>Course Title *</Label>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Course Title *</Label>
                 <Input
-                  placeholder="e.g. Introduction to AI & Physics"
+                  id="title"
+                  placeholder="e.g. Introduction to Artificial Intelligence"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Subject *</Label>
-                <Input
-                  placeholder="e.g. Physics"
-                  value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Topic *</Label>
-                <Input
-                  placeholder="e.g. AI Applications"
-                  value={formData.topic}
-                  onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <Label>Description</Label>
+                <Label htmlFor="description">Description</Label>
                 <Textarea
-                  placeholder="Brief description of the course..."
+                  id="description"
+                  placeholder="Provide a brief description of what this course will cover..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Duration (seconds)</Label>
-                <Input
-                  type="number"
-                  placeholder="600"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Avatar ID</Label>
-                <Select value={formData.avatarId} onValueChange={(v) => setFormData({ ...formData, avatarId: v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="avatar_001">Avatar 1 (Professional)</SelectItem>
-                    <SelectItem value="avatar_002">Avatar 2 (Casual)</SelectItem>
-                    <SelectItem value="avatar_003">Avatar 3 (Formal)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Voice</Label>
-                <Select value={formData.voiceId} onValueChange={(v) => setFormData({ ...formData, voiceId: v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="voice_en_us_female_01">English (US) - Female</SelectItem>
-                    <SelectItem value="voice_en_us_male_01">English (US) - Male</SelectItem>
-                    <SelectItem value="voice_en_uk_female_01">English (UK) - Female</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Target Audience</Label>
-                <Select value={formData.targetAudience} onValueChange={(v) => setFormData({ ...formData, targetAudience: v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Students">Students</SelectItem>
-                    <SelectItem value="Professionals">Professionals</SelectItem>
-                    <SelectItem value="Beginners">Beginners</SelectItem>
-                    <SelectItem value="Advanced">Advanced</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Age Group</Label>
-                <Select value={formData.ageGroup} onValueChange={(v) => setFormData({ ...formData, ageGroup: v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10-15">10-15</SelectItem>
-                    <SelectItem value="16-20">16-20</SelectItem>
-                    <SelectItem value="18-25">18-25</SelectItem>
-                    <SelectItem value="Adult">Adult (25+)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Style</Label>
-                <Select value={formData.style} onValueChange={(v) => setFormData({ ...formData, style: v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Educational">Educational</SelectItem>
-                    <SelectItem value="Professional">Professional</SelectItem>
-                    <SelectItem value="Casual">Casual</SelectItem>
-                    <SelectItem value="Interactive">Interactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Tone</Label>
-                <Select value={formData.tone} onValueChange={(v) => setFormData({ ...formData, tone: v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Friendly">Friendly</SelectItem>
-                    <SelectItem value="Formal">Formal</SelectItem>
-                    <SelectItem value="Motivational">Motivational</SelectItem>
-                    <SelectItem value="Serious">Serious</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <Label>Keywords (comma-separated)</Label>
-                <Input
-                  placeholder="e.g. AI, Physics, Machine Learning"
-                  value={formData.keywords}
-                  onChange={(e) => setFormData({ ...formData, keywords: e.target.value })}
+                  rows={5}
                 />
               </div>
             </div>
@@ -246,7 +115,7 @@ export default function CreatePage() {
               </Button>
               <Button
                 onClick={handleCreateCourse}
-                disabled={loading || !formData.title || !formData.subject || !formData.topic}
+                disabled={loading || !formData.title}
               >
                 {loading ? "Creating..." : "Create Course"}
               </Button>
