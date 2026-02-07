@@ -120,20 +120,20 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
 
   const handleSaveEdit = async () => {
     if (!editingChapter) return;
-    
+
     setLoading(true);
     try {
       await updateChapter(editingChapter.id, {
         title: editTitle,
         description: editDescription || undefined,
       });
-      
-      setChapters(chapters.map(c => 
-        c.id === editingChapter.id 
+
+      setChapters(chapters.map(c =>
+        c.id === editingChapter.id
           ? { ...c, title: editTitle, description: editDescription || null }
           : c
       ));
-      
+
       toast.success("Chapter updated");
       setEditingChapter(null);
       router.refresh();
