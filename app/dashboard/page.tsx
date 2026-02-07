@@ -2,13 +2,14 @@ export const dynamic = "force-dynamic";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/actions/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Video, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Video, Plus } from "lucide-react";
 import Link from "next/link";
+import { RecentVideosGrid } from "@/components/dashboard/RecentVideosGrid";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
-  
+
   // Get recent chapters with videos
   const recentVideos = await db.chapter.findMany({
     where: {
@@ -46,12 +47,33 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* Quick Action */}
+      <section>
+        <Link href="/dashboard/create">
+          <Card className="hover:shadow-md transition-all cursor-pointer group border-l-4 border-l-primary bg-gradient-to-r from-primary/5 to-transparent">
+            <CardHeader className="flex flex-row items-center space-y-0 pb-2 gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                <Plus className="h-5 w-5" />
+              </div>
+              <div>
+                <CardTitle className="text-sm font-medium">
+                  Create New Course
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Start building your educational content with AI
+                </p>
+              </div>
+            </CardHeader>
+          </Card>
+        </Link>
+      </section>
+
       {/* Recent Videos Section */}
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold font-heading">Recent Videos</h2>
         </div>
-        
+
         {recentVideos.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
@@ -62,43 +84,7 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {recentVideos.map((chapter) => (
-              <Link 
-                key={chapter.id} 
-                href={`/dashboard/courses/${chapter.course.id}`}
-              >
-                <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <CardTitle className="text-base line-clamp-2 group-hover:text-primary transition-colors">
-                          {chapter.title}
-                        </CardTitle>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {chapter.course.title}
-                        </p>
-                      </div>
-                      <Video className="h-5 w-5 text-primary flex-shrink-0" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center justify-between">
-                      <Badge variant={chapter.status === "PUBLISHED" ? "default" : "secondary"}>
-                        {chapter.status}
-                      </Badge>
-                      {chapter.updatedAt && (
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {new Date(chapter.updatedAt).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <RecentVideosGrid videos={recentVideos} />
         )}
       </section>
     </div>

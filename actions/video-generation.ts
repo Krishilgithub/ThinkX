@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { heyGenService, CreateVideoParams } from "@/lib/heygen";
+import { cloudinaryService } from "@/lib/cloudinary";
 import { revalidatePath } from "next/cache";
 
 export async function createVideoJob(
@@ -82,12 +83,43 @@ export async function pollVideoStatus(chapterId: string) {
 
     // Update DB if status changed
     if (statusData.status !== chapter.status.toLowerCase()) {
+      let finalVideoUrl = statusData.video_url;
+      let finalThumbnail = statusData.thumbnail_url;
+
+      // If video is completed, upload to Cloudinary
+      if (statusData.status === 'completed' && statusData.video_url) {
+        try {
+          console.log('[Video Generation] Uploading completed video to Cloudinary...');
+          const cloudinaryResult = await cloudinaryService.uploadVideoFromUrl(
+            statusData.video_url,
+            {
+              chapterId: chapterId,
+              folder: 'thinkx-videos'
+            }
+          );
+
+          // Use Cloudinary URL if upload was successful
+          if (cloudinaryResult.secureUrl) {
+            finalVideoUrl = cloudinaryResult.secureUrl;
+            console.log('[Video Generation] Video uploaded to Cloudinary:', cloudinaryResult.publicId);
+          }
+
+          // Use Cloudinary thumbnail if available
+          if (cloudinaryResult.thumbnailUrl) {
+            finalThumbnail = cloudinaryResult.thumbnailUrl;
+          }
+        } catch (uploadError: any) {
+          console.error('[Video Generation] Cloudinary upload failed:', uploadError.message);
+          // Continue with HeyGen URL if Cloudinary fails
+        }
+      }
+
       await db.chapter.update({
         where: { id: chapterId },
         data: {
           status: statusData.status.toUpperCase(),
-          videoUrl: statusData.video_url,
-          thumbnail: statusData.thumbnail_url,
+          videoUrl: finalVideoUrl,
+          thumbnail: finalThumbnail,
           duration: statusData.duration,
         },
       });
@@ -108,8 +140,8 @@ export async function pollVideoStatus(chapterId: string) {
 
     return {
       status: statusData.status.toUpperCase(),
-      videoUrl: statusData.video_url,
-      thumbnail: statusData.thumbnail_url,
+      videoUrl: finalVideoUrl,
+      thumbnail: finalThumbnail,
       error: statusData.error,
     };
   } catch (error) {
