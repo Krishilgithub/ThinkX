@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Mic, Video, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
