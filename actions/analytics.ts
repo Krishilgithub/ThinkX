@@ -1,10 +1,10 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { getDemoUser } from "./user";
+import { getCurrentUser } from "./auth";
 
 export async function getAnalyticsOverview() {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) return null;
 
   try {
@@ -21,7 +21,7 @@ export async function getAnalyticsOverview() {
     const totalCourses = courses.length;
     const publishedCourses = courses.filter(c => c.status === "PUBLISHED").length;
     const totalChapters = courses.reduce((acc, c) => acc + c.chapters.length, 0);
-    
+
     // Mock analytics data (in production, you'd track actual views)
     const totalViews = publishedCourses * 150; // Mock: avg 150 views per published course
     const totalWatchTime = totalViews * 300; // Mock: avg 5 min watch time

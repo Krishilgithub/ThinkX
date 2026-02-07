@@ -85,7 +85,7 @@ export default function CreatePage() {
       toast.error("Please fill in all required fields");
       return;
     }
-    
+
     setLoading(true);
     try {
       const course = await createCourse({
@@ -173,51 +173,51 @@ export default function CreatePage() {
                 <Input
                   placeholder="e.g. Introduction to AI & Physics"
                   value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Subject *</Label>
                 <Input
                   placeholder="e.g. Physics"
                   value={formData.subject}
-                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Topic *</Label>
                 <Input
                   placeholder="e.g. AI Applications"
                   value={formData.topic}
-                  onChange={(e) => setFormData({...formData, topic: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
                 />
               </div>
-              
+
               <div className="space-y-2 col-span-2">
                 <Label>Description</Label>
                 <Textarea
                   placeholder="Brief description of the course..."
                   value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Duration (seconds)</Label>
                 <Input
                   type="number"
                   placeholder="600"
                   value={formData.duration}
-                  onChange={(e) => setFormData({...formData, duration: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Avatar ID</Label>
-                <Select value={formData.avatarId} onValueChange={(v) => setFormData({...formData, avatarId: v})}>
+                <Select value={formData.avatarId} onValueChange={(v) => setFormData({ ...formData, avatarId: v })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -228,10 +228,10 @@ export default function CreatePage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Voice</Label>
-                <Select value={formData.voiceId} onValueChange={(v) => setFormData({...formData, voiceId: v})}>
+                <Select value={formData.voiceId} onValueChange={(v) => setFormData({ ...formData, voiceId: v })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -242,10 +242,10 @@ export default function CreatePage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Target Audience</Label>
-                <Select value={formData.targetAudience} onValueChange={(v) => setFormData({...formData, targetAudience: v})}>
+                <Select value={formData.targetAudience} onValueChange={(v) => setFormData({ ...formData, targetAudience: v })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -257,10 +257,10 @@ export default function CreatePage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Age Group</Label>
-                <Select value={formData.ageGroup} onValueChange={(v) => setFormData({...formData, ageGroup: v})}>
+                <Select value={formData.ageGroup} onValueChange={(v) => setFormData({ ...formData, ageGroup: v })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -272,10 +272,10 @@ export default function CreatePage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Style</Label>
-                <Select value={formData.style} onValueChange={(v) => setFormData({...formData, style: v})}>
+                <Select value={formData.style} onValueChange={(v) => setFormData({ ...formData, style: v })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -287,10 +287,10 @@ export default function CreatePage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Tone</Label>
-                <Select value={formData.tone} onValueChange={(v) => setFormData({...formData, tone: v})}>
+                <Select value={formData.tone} onValueChange={(v) => setFormData({ ...formData, tone: v })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -302,13 +302,13 @@ export default function CreatePage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2 col-span-2">
                 <Label>Keywords (comma-separated)</Label>
                 <Input
                   placeholder="e.g. AI, Physics, Machine Learning"
                   value={formData.keywords}
-                  onChange={(e) => setFormData({...formData, keywords: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, keywords: e.target.value })}
                 />
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { getDemoUser } from "./user";
+import { getCurrentUser } from "./auth";
 
 export async function getChapters(courseId: string) {
   try {
@@ -21,7 +21,7 @@ export async function createChapter(data: {
   title: string;
   description?: string;
 }) {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) throw new Error("Unauthorized");
 
   try {
@@ -56,7 +56,7 @@ export async function updateChapter(chapterId: string, data: {
   videoUrl?: string;
   status?: string;
 }) {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) throw new Error("Unauthorized");
 
   try {
@@ -77,7 +77,7 @@ export async function reorderChapters(
   courseId: string,
   updates: { id: string; orderIndex: number }[],
 ) {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) throw new Error("Unauthorized");
 
   try {
@@ -98,7 +98,7 @@ export async function reorderChapters(
 }
 
 export async function deleteChapter(chapterId: string, courseId: string) {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) throw new Error("Unauthorized");
 
   try {

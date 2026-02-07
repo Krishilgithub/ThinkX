@@ -1,8 +1,12 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  // Hash password for demo teacher
+  const hashedPassword = await bcrypt.hash("demo123", 10);
+
   // 1. Create Demo Teacher
   const teacher = await prisma.teacher.upsert({
     where: { email: "demo@thinkx.ai" },
@@ -10,6 +14,7 @@ async function main() {
     create: {
       email: "demo@thinkx.ai",
       name: "Krishil Agrawal",
+      password: hashedPassword,
       bio: "AI Education Pioneer creating engaging video content for students worldwide.",
       avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
     },

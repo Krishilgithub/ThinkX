@@ -1,38 +1,14 @@
-"use server";
-
-import { db } from "@/lib/db";
-import { getDemoUser } from "./user";
+// This file is deprecated - Resource model no longer exists in the new schema
+// The platform focuses on video course generation, not file/resource management
 
 export async function getResources() {
-  const user = await getDemoUser();
-  if (!user) return [];
-
-  return await db.resource.findMany({
-    where: { userId: user.id },
-    orderBy: { date: "desc" },
-  });
+  return [];
 }
 
-export async function createResource(data: {
-  name: string;
-  type: string;
-  url: string;
-  size?: string;
-}) {
-  const user = await getDemoUser();
-  if (!user) throw new Error("User not found");
-
-  return await db.resource.create({
-    data: {
-      ...data,
-      userId: user.id,
-      date: new Date(),
-    },
-  });
+export async function createResource() {
+  throw new Error("Resource model deprecated - feature not available");
 }
 
-export async function deleteResource(id: string) {
-  return await db.resource.delete({
-    where: { id },
-  });
+export async function deleteResource() {
+  throw new Error("Resource model deprecated - feature not available");
 }

@@ -7,15 +7,17 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // Teacher Model - Only teachers can create courses
 model Teacher {
-  id     String  @id @default(uuid())
-  email  String  @unique
-  name   String
-  avatar String?
-  bio    String? @db.Text
+  id       String  @id @default(uuid())
+  email    String  @unique
+  name     String
+  password String // Hashed password
+  avatar   String?
+  bio      String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

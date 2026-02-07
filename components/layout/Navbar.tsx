@@ -67,14 +67,15 @@ export function Navbar() {
             <Button
               variant="ghost"
               className="text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-full px-6"
+              asChild
             >
-              Sign In
+              <Link href="/login">Log In</Link>
             </Button>
             <Button
               className="rounded-full px-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 transition-all duration-300"
               asChild
             >
-              <Link href="/dashboard">Get Started</Link>
+              <Link href="/signup">Get Started</Link>
             </Button>
           </div>
 
@@ -105,14 +106,17 @@ export function Navbar() {
                   <Button
                     variant="ghost"
                     className="justify-start w-full text-zinc-900"
+                    asChild
                   >
-                    Sign In
+                    <Link href="/login" onClick={() => setIsOpen(false)}>
+                      Log In
+                    </Link>
                   </Button>
                   <Button
                     className="w-full rounded-full shadow-lg shadow-primary/20"
                     asChild
                   >
-                    <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                    <Link href="/signup" onClick={() => setIsOpen(false)}>
                       Get Started
                     </Link>
                   </Button>

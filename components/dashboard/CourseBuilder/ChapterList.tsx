@@ -7,9 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createChapter } from "@/actions/chapter";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { GenerateVideoModal } from "./GenerateVideoModal";
-import { VideoStatus } from "./VideoStatus";
+import { StatusBadge } from "./StatusBadge";
 import { useRouter } from "next/navigation";
 
 interface Chapter {
@@ -38,9 +37,9 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
     if (!newChapterTitle.trim()) return;
     setLoading(true);
     try {
-      const newChapter = await createChapter({ 
-        courseId, 
-        title: newChapterTitle 
+      const newChapter = await createChapter({
+        courseId,
+        title: newChapterTitle
       });
       setChapters([...chapters, newChapter]);
       setNewChapterTitle("");
@@ -104,7 +103,7 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-lg flex items-center gap-3">
                   {chapter.title}
-                  <VideoStatus status={chapter.status} />
+                  <StatusBadge status={chapter.status} />
                 </h3>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button variant="ghost" size="icon" className="h-8 w-8">

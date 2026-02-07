@@ -8,32 +8,57 @@ import {
   BookOpen,
   PlusCircle,
   Library,
-  BarChart,
   CreditCard,
-  Settings,
   HelpCircle,
   Zap,
   MoreVertical,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { logout } from "@/actions/auth";
+import { useRouter } from "next/navigation";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: BookOpen, label: "My Courses", href: "/dashboard/courses" },
   { icon: PlusCircle, label: "Create Lesson", href: "/dashboard/create" },
   { icon: Library, label: "Library", href: "/dashboard/library" },
-  { icon: BarChart, label: "Analytics", href: "/dashboard/analytics" },
   { icon: CreditCard, label: "Billing", href: "/dashboard/billing" },
 ];
 
 const secondaryItems = [
-  { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   { icon: HelpCircle, label: "Help", href: "/dashboard/help" },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    avatar?: string | null;
+  };
+}
+
+export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+    router.refresh();
+  };
+
+  // Get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
     <div className="flex flex-col h-full bg-card text-card-foreground">
@@ -105,23 +130,25 @@ export function Sidebar() {
       <div className="p-4 mt-4 border-t border-border">
         <div className="flex items-center space-x-3">
           <Avatar className="h-9 w-9 border border-border">
-            <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" />
-            <AvatarFallback>JD</AvatarFallback>
+            {user.avatar && <AvatarImage src={user.avatar} />}
+            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">
-              John Doe
+              {user.name}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              john@university.edu
+              {user.email}
             </p>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-muted-foreground"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+            onClick={handleLogout}
+            title="Logout"
           >
-            <MoreVertical className="h-4 w-4" />
+            <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </div>

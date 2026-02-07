@@ -2,10 +2,10 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { getDemoUser } from "./user";
+import { getCurrentUser } from "./auth";
 
 export async function getCourses() {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) return [];
 
   try {
@@ -29,7 +29,7 @@ export async function getCourses() {
 }
 
 export async function getRecentCourses(limit: number = 5) {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) return [];
 
   try {
@@ -63,7 +63,7 @@ export async function createCourse(data: {
   tone: string;
   keywords: string[];
 }) {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) throw new Error("Unauthorized");
 
   try {
@@ -84,7 +84,7 @@ export async function createCourse(data: {
 }
 
 export async function getCourseById(id: string) {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) return null;
 
   try {

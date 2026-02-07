@@ -1,19 +1,10 @@
 "use server";
 
 import { db } from "@/lib/db";
-
-// Hardcoded for demo - in real app would get from session/auth
-const DEMO_EMAIL = "demo@thinkx.ai";
-
-export async function getDemoUser() {
-  const teacher = await db.teacher.findUnique({
-    where: { email: DEMO_EMAIL },
-  });
-  return teacher;
-}
+import { getCurrentUser } from "@/actions/auth";
 
 export async function updateProfile(data: { name?: string; bio?: string; avatar?: string }) {
-  const teacher = await getDemoUser();
+  const teacher = await getCurrentUser();
   if (!teacher) return null;
 
   return await db.teacher.update({
