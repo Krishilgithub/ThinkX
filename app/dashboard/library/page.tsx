@@ -12,7 +12,7 @@ export default async function LibraryPage() {
       videoUrl: {
         not: null,
       },
-      status: "PUBLISHED",
+      status: "COMPLETED",
       course: {
         status: "PUBLISHED",
       },

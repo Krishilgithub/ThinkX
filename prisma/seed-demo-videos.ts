@@ -86,7 +86,7 @@ async function main() {
                     ...chapters[i],
                     courseId: course.id,
                     orderIndex: i,
-                    status: "PUBLISHED",
+                    status: "COMPLETED",
                 },
             });
         }

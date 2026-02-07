@@ -34,7 +34,7 @@ export function VideoStatus({
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
-    if (status === "PROCESSING" || status === "PENDING" || status === "DRAFT") {
+    if (status === "GENERATING" || status === "DRAFT") {
       // Start mock progress
       const progressInterval = setInterval(() => {
         setProgress((prev) => (prev >= 90 ? 90 : prev + 5));
