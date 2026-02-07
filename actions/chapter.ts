@@ -25,6 +25,16 @@ export async function createChapter(data: {
   if (!teacher) throw new Error("Unauthorized");
 
   try {
+    // Verify course belongs to current teacher
+    const course = await db.course.findUnique({
+      where: { id: data.courseId },
+      select: { teacherId: true },
+    });
+
+    if (!course || course.teacherId !== teacher.id) {
+      throw new Error("Unauthorized: Course not found or access denied");
+    }
+
     const lastChapter = await db.chapter.findFirst({
       where: { courseId: data.courseId },
       orderBy: { orderIndex: "desc" },
@@ -60,6 +70,16 @@ export async function updateChapter(chapterId: string, data: {
   if (!teacher) throw new Error("Unauthorized");
 
   try {
+    // Verify chapter's course belongs to current teacher
+    const chapter = await db.chapter.findUnique({
+      where: { id: chapterId },
+      include: { course: { select: { teacherId: true } } },
+    });
+
+    if (!chapter || chapter.course.teacherId !== teacher.id) {
+      throw new Error("Unauthorized: Chapter not found or access denied");
+    }
+
     const updatedChapter = await db.chapter.update({
       where: { id: chapterId },
       data,
@@ -81,6 +101,16 @@ export async function reorderChapters(
   if (!teacher) throw new Error("Unauthorized");
 
   try {
+    // Verify course belongs to current teacher
+    const course = await db.course.findUnique({
+      where: { id: courseId },
+      select: { teacherId: true },
+    });
+
+    if (!course || course.teacherId !== teacher.id) {
+      throw new Error("Unauthorized: Course not found or access denied");
+    }
+
     const transaction = updates.map((update) =>
       db.chapter.update({
         where: { id: update.id },
@@ -102,6 +132,16 @@ export async function deleteChapter(chapterId: string, courseId: string) {
   if (!teacher) throw new Error("Unauthorized");
 
   try {
+    // Verify chapter's course belongs to current teacher
+    const chapter = await db.chapter.findUnique({
+      where: { id: chapterId },
+      include: { course: { select: { teacherId: true } } },
+    });
+
+    if (!chapter || chapter.course.teacherId !== teacher.id) {
+      throw new Error("Unauthorized: Chapter not found or access denied");
+    }
+
     await db.chapter.delete({
       where: { id: chapterId },
     });

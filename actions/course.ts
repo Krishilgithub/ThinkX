@@ -88,7 +88,7 @@ export async function getCourseById(id: string) {
   if (!teacher) return null;
 
   try {
-    return await db.course.findUnique({
+    const course = await db.course.findUnique({
       where: { id },
       include: {
         chapters: {
@@ -96,6 +96,13 @@ export async function getCourseById(id: string) {
         },
       },
     });
+
+    // Verify course belongs to current teacher
+    if (!course || course.teacherId !== teacher.id) {
+      return null;
+    }
+
+    return course;
   } catch (error) {
     console.error("Failed to fetch course:", error);
     return null;

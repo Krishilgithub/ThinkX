@@ -124,25 +124,8 @@ export async function POST(req: Request) {
           data: {
             status: status.toUpperCase(),
             error: error || null,
-            errorCode: status === "failed" ? "HEYGEN_ERROR" : null,
-            videoUrl: finalVideoUrl,
-            thumbnailUrl: finalThumbnailUrl,
-            duration,
-            webhookReceivedAt: new Date(),
-            webhookPayload: event_data,
             completedAt:
               status === "completed" || status === "failed" ? new Date() : null,
-            progress: status === "completed" ? 100 : latestJob.progress,
-          },
-        });
-
-        // Log webhook event
-        await db.jobEvent.create({
-          data: {
-            jobId: latestJob.id,
-            eventType: "WEBHOOK_RECEIVED",
-            message: `Webhook received: status=${status}`,
-            metadata: event_data,
           },
         });
       }
@@ -164,8 +147,4 @@ export async function POST(req: Request) {
       { status: 500 },
     );
   }
-}
-
-export async function GET() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }

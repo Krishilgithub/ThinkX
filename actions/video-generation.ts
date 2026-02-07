@@ -4,14 +4,30 @@ import { db } from "@/lib/db";
 import { heyGenService, CreateVideoParams } from "@/lib/heygen";
 import { cloudinaryService } from "@/lib/cloudinary";
 import { revalidatePath } from "next/cache";
+import { getCurrentUser } from "./auth";
 
 export async function createVideoJob(
   chapterId: string,
   params: CreateVideoParams,
 ) {
+  const teacher = await getCurrentUser();
+  if (!teacher) {
+    return { error: "Unauthorized" };
+  }
+
   try {
+    // Verify chapter's course belongs to current teacher
+    const chapter = await db.chapter.findUnique({
+      where: { id: chapterId },
+      include: { course: { select: { teacherId: true } } },
+    });
+
+    if (!chapter || chapter.course.teacherId !== teacher.id) {
+      return { error: "Unauthorized: Chapter not found or access denied" };
+    }
+
     // 1. Update Chapter to GENERATING status
-    const chapter = await db.chapter.update({
+    await db.chapter.update({
       where: { id: chapterId },
       data: {
         status: "GENERATING",
@@ -59,14 +75,27 @@ export async function createVideoJob(
 }
 
 export async function pollVideoStatus(chapterId: string) {
+  const teacher = await getCurrentUser();
+  if (!teacher) {
+    return { error: "Unauthorized" };
+  }
+
   try {
     const chapter = await db.chapter.findUnique({
       where: { id: chapterId },
-      include: { jobs: { orderBy: { createdAt: "desc" }, take: 1 } },
+      include: {
+        jobs: { orderBy: { createdAt: "desc" }, take: 1 },
+        course: { select: { teacherId: true } },
+      },
     });
 
     if (!chapter || !chapter.heygenJobId) {
       return { status: "NOT_FOUND" };
+    }
+
+    // Verify chapter's course belongs to current teacher
+    if (chapter.course.teacherId !== teacher.id) {
+      return { error: "Unauthorized: Access denied" };
     }
 
     // If already completed, just return
