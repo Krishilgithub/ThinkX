@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "postinstall": "prisma generate",
     "seed:demo": "tsx prisma/seed-demo-videos.ts",
     "cleanup:demo": "tsx prisma/cleanup-demo-videos.ts"
   },
