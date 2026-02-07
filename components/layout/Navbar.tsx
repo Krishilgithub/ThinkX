@@ -45,7 +45,7 @@ export function Navbar() {
             <div className="bg-primary/10 p-2 rounded-full group-hover:bg-primary/20 transition-colors">
               <Zap className="h-5 w-5 text-primary" />
             </div>
-            <span className="font-bold font-heading text-xl tracking-tight text-zinc-900">
+            <span className="font-bold font-heading text-xl tracking-tight text-foreground">
               ThinkX
             </span>
           </Link>
@@ -56,7 +56,7 @@ export function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium text-zinc-600 hover:text-primary transition-colors relative group"
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors relative group"
               >
                 {link.name}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -68,7 +68,7 @@ export function Navbar() {
             <ThemeToggle />
             <Button
               variant="ghost"
-              className="text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-full px-6"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-full px-6"
               asChild
             >
               <Link href="/login">Log In</Link>
@@ -85,7 +85,7 @@ export function Navbar() {
           <div className="md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-zinc-900">
+                <Button variant="ghost" size="icon" className="text-foreground">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>

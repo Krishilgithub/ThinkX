@@ -63,15 +63,18 @@ export function Pricing() {
   const [isYearly, setIsYearly] = useState(false);
 
   return (
-    <section id="pricing" className="py-24 bg-zinc-50 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
+    <section
+      id="pricing"
+      className="py-24 bg-muted/30 dark:bg-muted/5 relative overflow-hidden transition-colors duration-300"
+    >
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-zinc-900">
+          <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-foreground">
             Simple, transparent <span className="text-primary">pricing</span>
           </h2>
-          <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Start for free, upgrade when you need more power.
           </p>
         </div>
@@ -80,27 +83,30 @@ export function Pricing() {
         <div className="flex justify-center items-center mb-12 space-x-4">
           <span
             className={cn(
-              "text-sm font-medium",
-              !isYearly ? "text-zinc-900" : "text-zinc-500",
+              "text-sm font-medium transition-colors",
+              !isYearly ? "text-foreground" : "text-muted-foreground",
             )}
           >
             Monthly
           </span>
           <button
             onClick={() => setIsYearly(!isYearly)}
-            className="w-14 h-8 bg-zinc-200 rounded-full p-1 relative transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className={cn(
+              "w-14 h-8 rounded-full p-1 relative transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary/20",
+              isYearly ? "bg-primary" : "bg-muted",
+            )}
           >
             <div
               className={cn(
-                "w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-300",
+                "w-6 h-6 bg-background rounded-full shadow-sm transition-transform duration-300",
                 isYearly ? "translate-x-6" : "translate-x-0",
               )}
             />
           </button>
           <span
             className={cn(
-              "text-sm font-medium",
-              isYearly ? "text-zinc-900" : "text-zinc-500",
+              "text-sm font-medium transition-colors",
+              isYearly ? "text-foreground" : "text-muted-foreground",
             )}
           >
             Yearly{" "}
@@ -115,26 +121,26 @@ export function Pricing() {
             <Card
               key={plan.name}
               className={cn(
-                "relative border-zinc-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col",
+                "relative bg-card border-border shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col",
                 plan.popular
-                  ? "border-primary ring-1 ring-primary shadow-primary/10"
-                  : "border-zinc-200",
+                  ? "border-primary ring-1 ring-primary shadow-primary/10 dark:shadow-primary/20"
+                  : "border-border",
               )}
             >
               {plan.popular && (
                 <div className="absolute top-0 right-0 left-0 h-1 bg-primary rounded-t-xl" />
               )}
               {plan.popular && (
-                <div className="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                <div className="absolute top-4 right-4 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full shadow-sm">
                   MOST POPULAR
                 </div>
               )}
 
               <CardHeader>
-                <CardTitle className="text-2xl font-bold text-zinc-900">
+                <CardTitle className="text-2xl font-bold text-foreground">
                   {plan.name}
                 </CardTitle>
-                <CardDescription className="text-zinc-500">
+                <CardDescription className="text-muted-foreground">
                   {plan.description}
                 </CardDescription>
               </CardHeader>
@@ -143,15 +149,15 @@ export function Pricing() {
                   {typeof plan.price.monthly === "number" &&
                   typeof plan.price.yearly === "number" ? (
                     <>
-                      <span className="text-4xl font-bold font-heading text-zinc-900">
+                      <span className="text-4xl font-bold font-heading text-foreground">
                         ${isYearly ? plan.price.yearly : plan.price.monthly}
                       </span>
-                      <span className="text-zinc-500">
+                      <span className="text-muted-foreground">
                         /{isYearly ? "year" : "month"}
                       </span>
                     </>
                   ) : (
-                    <span className="text-4xl font-bold font-heading text-zinc-900">
+                    <span className="text-4xl font-bold font-heading text-foreground">
                       Custom
                     </span>
                   )}
@@ -161,7 +167,7 @@ export function Pricing() {
                   {plan.features.map((feature) => (
                     <li
                       key={feature}
-                      className="flex items-start text-sm text-zinc-600"
+                      className="flex items-start text-sm text-muted-foreground"
                     >
                       <Check className="h-4 w-4 text-primary mr-2 mt-0.5 shrink-0" />
                       {feature}
@@ -175,7 +181,7 @@ export function Pricing() {
                     "w-full h-11",
                     plan.popular
                       ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
-                      : "bg-zinc-900 hover:bg-zinc-800 text-white",
+                      : "bg-foreground hover:bg-foreground/90 text-background",
                   )}
                   variant={plan.popular ? "default" : "secondary"}
                 >
