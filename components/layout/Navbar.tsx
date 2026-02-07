@@ -16,7 +16,11 @@ const navLinks = [
   { name: "FAQ", href: "#faq" },
 ];
 
-export function Navbar() {
+interface NavbarProps {
+  isLoggedIn?: boolean;
+}
+
+export function Navbar({ isLoggedIn = false }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const { scrollY } = useScroll();
@@ -66,19 +70,30 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            <Button
-              variant="ghost"
-              className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-full px-6"
-              asChild
-            >
-              <Link href="/login">Log In</Link>
-            </Button>
-            <Button
-              className="rounded-full px-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 transition-all duration-300"
-              asChild
-            >
-              <Link href="/signup">Get Started</Link>
-            </Button>
+            {isLoggedIn ? (
+              <Button
+                className="rounded-full px-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 transition-all duration-300"
+                asChild
+              >
+                <Link href="/dashboard">Go to Dashboard</Link>
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-full px-6"
+                  asChild
+                >
+                  <Link href="/login">Log In</Link>
+                </Button>
+                <Button
+                  className="rounded-full px-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 transition-all duration-300"
+                  asChild
+                >
+                  <Link href="/signup">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Nav */}
@@ -103,25 +118,37 @@ export function Navbar() {
                     >
                       {link.name}
                     </Link>
-                  ))}
-                  <div className="h-px bg-zinc-200" />
-                  <Button
-                    variant="ghost"
-                    className="justify-start w-full text-zinc-900"
-                    asChild
-                  >
-                    <Link href="/login" onClick={() => setIsOpen(false)}>
-                      Log In
-                    </Link>
-                  </Button>
-                  <Button
-                    className="w-full rounded-full shadow-lg shadow-primary/20"
-                    asChild
-                  >
-                    <Link href="/signup" onClick={() => setIsOpen(false)}>
-                      Get Started
-                    </Link>
-                  </Button>
+                  ))}                  <div className="h-px bg-zinc-200" />
+                  {isLoggedIn ? (
+                    <Button
+                      className="w-full rounded-full shadow-lg shadow-primary/20"
+                      asChild
+                    >
+                      <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                        Go to Dashboard
+                      </Link>
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        variant="ghost"
+                        className="justify-start w-full text-zinc-900"
+                        asChild
+                      >
+                        <Link href="/login" onClick={() => setIsOpen(false)}>
+                          Log In
+                        </Link>
+                      </Button>
+                      <Button
+                        className="w-full rounded-full shadow-lg shadow-primary/20"
+                        asChild
+                      >
+                        <Link href="/signup" onClick={() => setIsOpen(false)}>
+                          Get Started
+                        </Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>

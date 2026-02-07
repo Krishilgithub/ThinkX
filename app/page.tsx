@@ -7,11 +7,13 @@ import { Testimonials } from "@/components/landing/Testimonials";
 import { Pricing } from "@/components/landing/Pricing";
 import { FAQ } from "@/components/landing/FAQ";
 import { CTA } from "@/components/landing/CTA";
+import { getSession } from "@/actions/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getSession();
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30">
-      <Navbar />
+      <Navbar isLoggedIn={!!session} />
       <main className="flex-grow">
         <Hero />
         <Features />

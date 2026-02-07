@@ -68,7 +68,7 @@ export function RecentVideosGrid({ videos }: RecentVideosGridProps) {
                             <div className="flex items-center justify-between">
                                 <Badge
                                     variant={
-                                        chapter.status === "PUBLISHED" ? "default" : "secondary"
+                                        chapter.status === "COMPLETED" ? "default" : "secondary"
                                     }
                                 >
                                     {chapter.status}
