@@ -129,8 +129,8 @@ export function GenerateVideoModal({
 
         setVideoStatus({
           status: result.status || "PROCESSING",
-          videoUrl: result.videoUrl,
-          thumbnail: result.thumbnail,
+          videoUrl: result.videoUrl || undefined,
+          thumbnail: result.thumbnail || undefined,
         });
 
         // Stop polling if completed or failed
