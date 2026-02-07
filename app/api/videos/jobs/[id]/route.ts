@@ -11,10 +11,10 @@ import { db } from "@/lib/db";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const jobId = params.id;
+    const { id: jobId } = await params;
 
     // Fetch job with related chapter info
     const job = await db.videoJob.findUnique({

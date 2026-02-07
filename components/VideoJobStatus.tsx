@@ -45,7 +45,7 @@ const statusConfig = {
   },
   COMPLETED: {
     label: "Completed",
-    variant: "success" as const,
+    variant: "default" as const,
     icon: CheckCircle,
     color: "text-green-500",
     description: "Video generated successfully!",
@@ -186,8 +186,11 @@ export function VideoJobStatus({
         {status.status === "COMPLETED" && status.videoUrl && (
           <div className="space-y-4">
             <VideoPlayer
-              url={status.videoUrl}
-              thumbnail={status.thumbnailUrl || undefined}
+              isOpen={true}
+              onClose={() => {}}
+              videoUrl={status.videoUrl}
+              title="Generated Video"
+              description={status.thumbnailUrl || undefined}
             />
 
             <div className="flex gap-2">

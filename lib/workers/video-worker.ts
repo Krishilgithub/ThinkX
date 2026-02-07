@@ -58,7 +58,7 @@ async function pollUntilComplete(jobId: string, heyGenJobId: string) {
             console.log("[Worker] Uploading completed video to Cloudinary...");
             const cloudinaryResult = await cloudinaryService.uploadVideoFromUrl(
               status.video_url,
-              { jobId, folder: "thinkx-videos" },
+              { folder: "thinkx-videos" },
             );
 
             if (cloudinaryResult.secureUrl) {

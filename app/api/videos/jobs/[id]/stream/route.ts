@@ -11,9 +11,9 @@ import { db } from "@/lib/db";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const jobId = params.id;
+  const { id: jobId } = await params;
   const encoder = new TextEncoder();
 
   // Create readable stream for SSE

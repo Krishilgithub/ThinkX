@@ -41,7 +41,7 @@ function verifyWebhookSignature(payload: string, signature: string): boolean {
 export async function POST(req: Request) {
   try {
     // 1. Get signature and payload
-    const headersList = headers();
+    const headersList = await headers();
     const signature = headersList.get("x-heygen-signature") || "";
     const payload = await req.text();
 
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
       if (status === "completed" && video_url) {
         try {
           console.log("[Webhook] Uploading video to Cloudinary...");
-          const cloudinaryResult = await cloudinaryService.uploadVideoFromURL(
+          const cloudinaryResult = await cloudinaryService.uploadVideoFromUrl(
             video_url,
             { chapterId: chapter.id, folder: "thinkx-videos" },
           );
