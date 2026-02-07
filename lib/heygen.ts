@@ -81,6 +81,43 @@ export class HeyGenService {
     }
 
     try {
+      // Import avatar service
+      const { heyGenAvatarService } = await import("@/lib/heygen-avatars");
+
+      // Validate and get avatar
+      let finalAvatarId: string;
+
+      if (params.avatarId) {
+        const validation = await heyGenAvatarService.validateAvatarId(
+          params.avatarId,
+        );
+
+        if (validation.valid && validation.avatar) {
+          finalAvatarId = validation.avatar.avatarId;
+          console.log(`[HeyGen] Using validated avatar: ${finalAvatarId}`);
+        } else {
+          heyGenAvatarService.logInvalidAvatarAttempt(
+            params.avatarId,
+            "Video generation",
+          );
+
+          if (validation.fallback) {
+            finalAvatarId = validation.fallback.avatarId;
+            console.warn(
+              `[HeyGen] Avatar ${params.avatarId} invalid. Using fallback: ${finalAvatarId}`,
+            );
+          } else {
+            throw new Error("No valid avatar available");
+          }
+        }
+      } else {
+        const defaultAvatar = await heyGenAvatarService.getDefaultAvatar();
+        finalAvatarId = defaultAvatar.avatarId;
+        console.log(
+          `[HeyGen] No avatar provided. Using default: ${finalAvatarId}`,
+        );
+      }
+
       // Fetch available voices
       const voices = await this.getVoices();
       const defaultVoice =
@@ -97,7 +134,7 @@ export class HeyGenService {
           {
             character: {
               type: "avatar",
-              avatar_id: params.avatarId || "default-avatar-id",
+              avatar_id: finalAvatarId, // ✅ Now using validated avatar ID
               avatar_style: "normal",
             },
             voice: {

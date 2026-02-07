@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/select";
 import { createVideoJob } from "@/actions/video-generation";
 import { toast } from "sonner";
+import { AvatarSelector } from "@/components/AvatarSelector";
 
 // ... (imports)
 
@@ -228,6 +229,26 @@ export function GenerateVideoModal({
                   </FormControl>
                   <FormDescription>
                     Choose a background color for your video
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="avatarId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Avatar</FormLabel>
+                  <FormControl>
+                    <AvatarSelector
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Select an avatar to present your video content
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
