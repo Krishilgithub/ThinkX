@@ -5,10 +5,10 @@ export async function getResources() {
   return [];
 }
 
-export async function createResource() {
+export async function createResource(_data?: any) {
   throw new Error("Resource model deprecated - feature not available");
 }
 
-export async function deleteResource() {
+export async function deleteResource(_id?: string) {
   throw new Error("Resource model deprecated - feature not available");
 }

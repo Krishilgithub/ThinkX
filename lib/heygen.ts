@@ -1,6 +1,7 @@
 export interface CreateVideoParams {
   title: string;
   description?: string;
+  script?: string;
   tone?: string;
   language?: string;
   avatarId?: string;

@@ -138,7 +138,7 @@ export function GenerateVideoModal({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Generate AI Video</DialogTitle>
           <DialogDescription>
@@ -146,7 +146,7 @@ export function GenerateVideoModal({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pb-2">
             <FormField
               control={form.control}
               name="title"

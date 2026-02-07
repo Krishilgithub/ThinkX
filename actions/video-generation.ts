@@ -81,10 +81,11 @@ export async function pollVideoStatus(chapterId: string) {
     // Check status with HeyGen
     const statusData = await heyGenService.checkStatus(chapter.heygenJobId);
 
+    let finalVideoUrl = statusData.video_url;
+    let finalThumbnail = statusData.thumbnail_url;
+
     // Update DB if status changed
     if (statusData.status !== chapter.status.toLowerCase()) {
-      let finalVideoUrl = statusData.video_url;
-      let finalThumbnail = statusData.thumbnail_url;
 
       // If video is completed, upload to Cloudinary
       if (statusData.status === 'completed' && statusData.video_url) {

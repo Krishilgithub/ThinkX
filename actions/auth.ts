@@ -15,6 +15,7 @@ export interface SessionUser {
     email: string;
     name: string;
     avatar?: string | null;
+    [key: string]: string | null | undefined;
 }
 
 // Sign up new teacher
