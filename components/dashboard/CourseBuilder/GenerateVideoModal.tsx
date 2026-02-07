@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createVideoJob } from "@/actions/video-generation";
+import { createVideoJob, pollVideoStatus } from "@/actions/video-generation";
 import { toast } from "sonner";
 import { AvatarSelector } from "@/components/AvatarSelector";
 
@@ -85,6 +85,13 @@ export function GenerateVideoModal({
   trigger,
 }: GenerateVideoModalProps) {
   const [open, setOpen] = useState(false);
+  const [isPolling, setIsPolling] = useState(false);
+  const [videoStatus, setVideoStatus] = useState<{
+    status: string;
+    videoUrl?: string;
+    thumbnail?: string;
+    error?: string;
+  } | null>(null);
   // removed useToast hook
 
   const form = useForm({
@@ -102,6 +109,50 @@ export function GenerateVideoModal({
 
   const { isSubmitting } = form.formState;
 
+  // Poll for video status every 5 seconds
+  useEffect(() => {
+    if (!isPolling) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const result = await pollVideoStatus(chapterId);
+
+        if (result.error) {
+          setVideoStatus({ status: "FAILED", error: result.error });
+          setIsPolling(false);
+          clearInterval(pollInterval);
+          toast.error("Generation Failed", {
+            description: result.error,
+          });
+          return;
+        }
+
+        setVideoStatus({
+          status: result.status || "PROCESSING",
+          videoUrl: result.videoUrl,
+          thumbnail: result.thumbnail,
+        });
+
+        // Stop polling if completed or failed
+        if (result.status === "COMPLETED" || result.status === "FAILED") {
+          setIsPolling(false);
+          clearInterval(pollInterval);
+
+          if (result.status === "COMPLETED") {
+            toast.success("Video Ready!", {
+              description: "Your AI video has been generated successfully.",
+            });
+            onSuccess?.();
+          }
+        }
+      } catch (error) {
+        console.error("Polling error:", error);
+      }
+    }, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [isPolling, chapterId, onSuccess]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const result = await createVideoJob(chapterId, values);
@@ -114,13 +165,12 @@ export function GenerateVideoModal({
       }
 
       toast.success("Generation Started", {
-        description:
-          "Your video is being created. This may take a few minutes.",
+        description: "Your video is being created. This may take 2-5 minutes.",
       });
 
-      setOpen(false);
-      form.reset();
-      onSuccess?.();
+      // Start polling for status (don't close modal)
+      setVideoStatus({ status: "PROCESSING" });
+      setIsPolling(true);
     } catch (error) {
       toast.error("Error", {
         description: "Something went wrong. Please try again.",
@@ -128,8 +178,18 @@ export function GenerateVideoModal({
     }
   }
 
+  // Reset state when modal closes
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      setIsPolling(false);
+      setVideoStatus(null);
+      form.reset();
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="outline" size="sm">
@@ -146,7 +206,10 @@ export function GenerateVideoModal({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pb-2">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 pb-2"
+          >
             <FormField
               control={form.control}
               name="title"
