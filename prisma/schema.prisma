@@ -53,7 +53,6 @@ model Course {
   // Metadata
   thumbnail String?
   status    String  @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
-  isTemplate Boolean @default(false) // Mark as template/sample video for all users
 
   // Teacher Relation
   teacherId String
@@ -129,19 +128,19 @@ model VideoJob {
 
 // HeyGen Avatar Model - Cache available avatars from HeyGen API
 model HeyGenAvatar {
-  id               String   @id @default(uuid())
-  avatarId         String   @unique // HeyGen's avatar_id
-  avatarName       String   // Display name
-  gender           String?  // "male", "female", etc.
-  previewImageUrl  String?  // Preview image URL
-  previewVideoUrl  String?  // Preview video URL
-  avatarStyle      String   @default("normal") // "normal", "circle"
-  isPublic         Boolean  @default(true)
-  isAvailable      Boolean  @default(true)
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  
+  id              String  @id @default(uuid())
+  avatarId        String  @unique // HeyGen's avatar_id
+  avatarName      String // Display name
+  gender          String? // "male", "female", etc.
+  previewImageUrl String? // Preview image URL
+  previewVideoUrl String? // Preview video URL
+  avatarStyle     String  @default("normal") // "normal", "circle"
+  isPublic        Boolean @default(true)
+  isAvailable     Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([isAvailable])
   @@index([isPublic])
   @@index([gender])

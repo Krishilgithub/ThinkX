@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { GenerateVideoModal } from "./GenerateVideoModal";
 import { StatusBadge } from "./StatusBadge";
 import { useRouter } from "next/navigation";
+import { VideoPlayer } from "@/components/VideoPlayer";
 
 interface Chapter {
   id: string;
@@ -32,6 +33,11 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [newChapterTitle, setNewChapterTitle] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<{
+    url: string;
+    title: string;
+    description?: string;
+  } | null>(null);
 
   const handleCreate = async () => {
     if (!newChapterTitle.trim()) return;
@@ -128,7 +134,14 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
               {/* Video Section */}
               <div className="pl-4 border-l-2 border-border/50 space-y-2 mt-4">
                 {chapter.videoUrl ? (
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-colors"
+                    onClick={() => setSelectedVideo({
+                      url: chapter.videoUrl!,
+                      title: chapter.title,
+                      description: chapter.description || undefined,
+                    })}
+                  >
                     <div className="flex items-center gap-3">
                       <PlayCircle className="h-5 w-5 text-primary" />
                       <div>
@@ -140,11 +153,9 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
                         )}
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" asChild>
-                      <a href={chapter.videoUrl} target="_blank" rel="noopener noreferrer">
-                        View
-                      </a>
-                    </Button>
+                    <div className="text-xs text-primary font-medium">
+                      Click to view
+                    </div>
                   </div>
                 ) : (
                   <div className="text-sm text-muted-foreground italic py-2">
@@ -182,6 +193,16 @@ export function ChapterList({ courseId, initialChapters }: ChapterListProps) {
           </div>
         )}
       </div>
+
+      {selectedVideo && (
+        <VideoPlayer
+          isOpen={true}
+          onClose={() => setSelectedVideo(null)}
+          videoUrl={selectedVideo.url}
+          title={selectedVideo.title}
+          description={selectedVideo.description}
+        />
+      )}
     </div>
   );
 }
