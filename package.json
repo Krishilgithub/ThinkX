@@ -7,8 +7,6 @@
   },
   "scripts": {
     "dev": "next dev",
-    "worker": "tsx watch lib/workers/video-worker.ts",
-    "dev:all": "concurrently \"npm run dev\" \"npm run worker\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
